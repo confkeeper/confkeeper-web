@@ -1,0 +1,1 @@
+export * as ConfigInfoAPI from './config_info';

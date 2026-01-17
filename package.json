@@ -1,0 +1,39 @@
+{
+  "name": "confkeeper",
+  "private": true,
+  "version": "0.0.1",
+  "type": "module",
+  "scripts": {
+    "dev": "rsbuild dev",
+    "build": "rsbuild build",
+    "preview": "rsbuild preview"
+  },
+  "dependencies": {
+    "@douyinfe/semi-icons": "^2.90.13",
+    "@douyinfe/semi-icons-lab": "^2.90.13",
+    "@douyinfe/semi-illustrations": "^2.90.13",
+    "@douyinfe/semi-ui-19": "^2.90.13",
+    "alova": "^3.4.1",
+    "jwt-decode": "^4.0.0",
+    "monaco-editor-webpack-plugin": "^7.1.1",
+    "motion": "^12.26.2",
+    "react": "^19.2.3",
+    "react-dom": "^19.2.3",
+    "react-icons": "^5.5.0",
+    "react-monaco-editor": "^0.59.0",
+    "react-router-dom": "^7.12.0",
+    "zustand": "^5.0.10"
+  },
+  "devDependencies": {
+    "@rsbuild/core": "2.0.0-alpha.0",
+    "@rsbuild/plugin-react": "^1.4.2",
+    "@rsbuild/plugin-sass": "^1.4.0",
+    "@tailwindcss/postcss": "^4.1.18",
+    "@types/node": "^24.10.8",
+    "@types/react": "^19.2.8",
+    "@types/react-dom": "^19.2.3",
+    "sass": "^1.97.2",
+    "tailwindcss": "^4.1.18",
+    "typescript": "^5.9.3"
+  }
+}
