@@ -111,6 +111,7 @@ const Login = () => {
                             rules={[
                                 {required: true, message: '验证码不能为空'}
                             ]}
+                            showClear
                         />
                     </div>
                     <div className="flex items-end pb-3">

@@ -179,6 +179,7 @@ const EditConfigContextPage = () => {
                     placeholder="请输入配置名称"
                     style={{width: "1100px"}}
                     disabled={loading}
+                    showClear
                 />
 
                     <Form.Input
@@ -187,6 +188,7 @@ const EditConfigContextPage = () => {
                     placeholder="请输入配置描述"
                     style={{width: "1100px"}}
                     disabled={loading}
+                    showClear
                 />
 
                     <Form.RadioGroup field="type" label="配置类型" style={{width: "1100px"}} disabled={loading}>

@@ -21,7 +21,13 @@ export interface DeleteConfigInfoParams {
   config_id: string;
 }
 
+export interface BatchDeleteConfigInfoParams {
+    config_ids: string[];
+}
+
 export interface DeleteConfigInfoResp extends CommonResp {}
+
+export interface BatchDeleteConfigInfoResp extends CommonResp {}
 
 export interface ListConfigInfosParams {
   page: number;

@@ -108,45 +108,57 @@ const ConfigInfoPage = () => {
         });
     };
 
-    const handleClone = async () => {
+    const handleBatchDelete = () => {
+        Modal.confirm({
+            title: '确认批量删除',
+            content: `确定要删除选中的 ${selectedRows.length} 条记录吗？`,
+            onOk: async () => {
+                const success = await ConfigInfoService.batchDelete({
+                    config_ids: selectedRows.map(row => row.config_id)
+                });
+                if (success) {
+                    refresh();
+                    setSelectedRows([]);
+                }
+            }
+        });
+    };
+
+    const handleClone = () => {
         if (selectedRows.length === 0 || !cloneTargetTenantId) {
             Toast.warning("请选择要克隆的配置和目标命名空间");
             return;
         }
 
         setCloneLoading(true);
-        try {
-            // 获取表单中修改后的值
-            const formValues = cloneFormApi.current?.getValues() || {};
+        // 获取表单中修改后的值
+        const items = selectedRows.map(row => {
+            const configId = row.config_id;
+            // 优先使用修改后的值，如果没有修改则使用原始值
+            const modifiedData = modifiedCloneData[configId];
 
-            const items = selectedRows.map(row => {
-                const configId = row.config_id;
-                // 优先使用修改后的值，如果没有修改则使用原始值
-                const modifiedData = modifiedCloneData[configId];
+            return {
+                config_id: configId,
+                data_id: modifiedData?.data_id || row.data_id,
+                group_id: modifiedData?.group_id || row.group_id
+            };
+        });
 
-                return {
-                    config_id: configId,
-                    data_id: modifiedData?.data_id || row.data_id,
-                    group_id: modifiedData?.group_id || row.group_id
-                };
-            });
-
-            await ConfigInfoService.clone({
-                tenant_id: cloneTargetTenantId,
-                items
-            });
-
+        ConfigInfoService.clone({
+            tenant_id: cloneTargetTenantId,
+            items
+        }).then((ok) => {
+            if (!ok) return;
+            // 成功时关闭表单
             Toast.success(`成功克隆 ${selectedRows.length} 个配置`);
             setCloneModalVisible(false);
             setSelectedRows([]);
             setCloneTargetTenantId('');
             setModifiedCloneData({});
             refresh();
-        } catch (error) {
-            Toast.error("克隆配置失败");
-        } finally {
+        }).finally(() => {
             setCloneLoading(false);
-        }
+        });
     };
     // 处理输入框变化
     const handleCloneInputChange = (configId: string, field: string, value: string) => {
@@ -213,7 +225,8 @@ const ConfigInfoPage = () => {
             <div className="flex flex-col gap-4 p-4">
                 {/* 命名空间选择 */}
                 <div className="flex flex-col gap-2 p-2">
-                    <div className="flex justify-between items-center p-1 rounded-lg shadow-sm bg-[#efefef] dark:bg-gray-800 transition-colors duration-200">
+                    <div
+                        className="flex justify-between items-center p-1 rounded-lg shadow-sm bg-[#efefef] dark:bg-gray-800 transition-colors duration-200">
                         {tenantResponse[0].loading ? (
                             <div className="text-sm">加载中...</div>
                         ) : tenantList.length === 0 ? (
@@ -305,6 +318,7 @@ const ConfigInfoPage = () => {
                                                    searchConfig();
                                                }
                                            }}
+                                           showClear
                                     />
                                     <Input value={groupIdInput}
                                            onChange={(value: string | undefined) => setGroupIdInput(value || '')}
@@ -314,6 +328,7 @@ const ConfigInfoPage = () => {
                                                    searchConfig();
                                                }
                                            }}
+                                           showClear
                                     />
                                 </>
                             );
@@ -324,8 +339,9 @@ const ConfigInfoPage = () => {
                             onChange={(value) => {
                                 setTypeInput(typeof value === 'string' ? value : '');
                             }}
-                            style={{width: 300}}
+                            style={{width: 400}}
                             placeholder="类型"
+                            showClear
                         >
                             <Select.Option value="text">text</Select.Option>
                             <Select.Option value="json">json</Select.Option>
@@ -377,7 +393,15 @@ const ConfigInfoPage = () => {
                             }}
                             disabled={selectedRows.length === 0}
                         >
-                            克隆配置 ({selectedRows.length})
+                            克隆配置
+                        </Button>
+                        <Button
+                            type="danger"
+                            theme="solid"
+                            onClick={() => handleBatchDelete()}
+                            disabled={selectedRows.length === 0}
+                        >
+                            批量删除
                         </Button>
                     </div>
                 </div>
@@ -456,11 +480,13 @@ const ConfigInfoPage = () => {
                         field='data_id'
                         label='Data Id'
                         rules={[{required: true, message: '请输入Data Id'}]}
+                        showClear
                     />
                     <Form.Input
                         field='group_id'
                         label='Group'
                         rules={[{required: true, message: '请输入Group'}]}
+                        showClear
                     />
                 </Form>
             </Modal>
@@ -498,6 +524,7 @@ const ConfigInfoPage = () => {
                         onChange={(value) => setCloneTargetTenantId(typeof value === 'string' ? value : '')}
                         style={{width: '100%'}}
                         rules={[{required: true, message: '请选择目标命名空间'}]}
+                        showClear
                     />
 
                     <div style={{marginTop: '16px'}}>
@@ -510,10 +537,6 @@ const ConfigInfoPage = () => {
                             padding: '8px'
                         }}>
                             {selectedRows.map((row: ConfigInfo, index: number) => {
-                                const modifiedData = modifiedCloneData[row.config_id];
-                                const currentDataId = modifiedData?.data_id || row.data_id;
-                                const currentGroupId = modifiedData?.group_id || row.group_id;
-
                                 return (
                                     <div key={row.config_id} style={{
                                         padding: '8px 0',

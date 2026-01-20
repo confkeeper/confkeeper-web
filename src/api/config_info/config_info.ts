@@ -2,6 +2,8 @@ import { request } from '@/src/utils/request';
 import {
     AddConfigInfoParams,
     AddConfigInfoResp,
+    BatchDeleteConfigInfoParams,
+    BatchDeleteConfigInfoResp,
     CleanupConfigResp,
     CloneConfigParams,
     CloneConfigResp,
@@ -28,6 +30,11 @@ export async function Add(params: AddConfigInfoParams) {
 /** 删除配置 */
 export async function Delete(params: DeleteConfigInfoParams) {
   return request.Delete<DeleteConfigInfoResp>(`/api/config/delete/${params.config_id}`);
+}
+
+/** 批量删除配置 */
+export async function BatchDelete(params: BatchDeleteConfigInfoParams) {
+    return request.Delete<BatchDeleteConfigInfoResp>(`/api/config/batch_delete`, params);
 }
 
 /** 获取配置列表 */

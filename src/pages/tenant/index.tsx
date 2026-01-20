@@ -152,16 +152,19 @@ const TenantPage = () => {
                         field='tenant_id'
                         label='命名空间ID'
                         rules={[{required: true, message: '请输入命名空间ID'}]}
+                        showClear
                     />
                     <Form.Input
                         field='tenant_name'
                         label='命名空间名称'
                         rules={[{required: true, message: '请输入命名空间名称'}]}
+                        showClear
                     />
                     <Form.Input
                         field='tenant_desc'
                         label='描述'
                         rules={[{required: true, message: '请输入描述'}]}
+                        showClear
                     />
                 </Form>
             </Modal>

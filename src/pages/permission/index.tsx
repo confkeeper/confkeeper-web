@@ -1,5 +1,5 @@
-import React, { useRef, useState, useEffect } from "react";
-import { Table, Button, Modal, Form, Input, Switch, Select } from "@douyinfe/semi-ui-19";
+import React, { useRef, useState } from "react";
+import { Table, Button, Modal, Form, Input, Select } from "@douyinfe/semi-ui-19";
 import useService from "@/src/hooks/useService";
 import { ColumnProps } from "@douyinfe/semi-ui-19/lib/es/table";
 import { FormApi } from "@douyinfe/semi-ui-19/lib/es/form";
@@ -151,6 +151,7 @@ const PermissionPage = () => {
                                     setPage(1);
                                 }
                             }}
+                            showClear
                         />
                         <Button type="primary" theme="solid" onClick={() => {
                             setQueryParams({
@@ -215,6 +216,7 @@ const PermissionPage = () => {
                         rules={[{required: true, message: '请选择角色名'}]}
                         placeholder="请选择角色名"
                         style={{ width: 300 }}
+                        showClear
                     >
                         {roleOptions.map(option => (
                             <Select.Option key={option.value} value={option.value}>
@@ -228,6 +230,7 @@ const PermissionPage = () => {
                         rules={[{required: true, message: '请选择资源'}]}
                         placeholder="请选择资源"
                         style={{ width: 300 }}
+                        showClear
                     >
                         {tenantOptions.map(option => (
                             <Select.Option key={option.value} value={option.value}>
@@ -241,6 +244,7 @@ const PermissionPage = () => {
                         rules={[{required: true, message: '请选择操作'}]}
                         placeholder="请选择操作"
                         style={{ width: 300 }}
+                        showClear
                     >
                         <Select.Option value="r">r</Select.Option>
                         <Select.Option value="w">w</Select.Option>

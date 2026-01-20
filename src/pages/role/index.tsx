@@ -139,11 +139,13 @@ const RolePage = () => {
                         field='role'
                         label='角色名'
                         rules={[{required: true, message: '请输入角色名'}]}
+                        showClear
                     />
                     <Form.Input
                         field='username'
                         label='用户名'
                         rules={[{required: true, message: '请输入用户名'}]}
+                        showClear
                     />
                 </Form>
             </Modal>

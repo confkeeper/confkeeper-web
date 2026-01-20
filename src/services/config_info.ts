@@ -1,5 +1,6 @@
 import {
     AddConfigInfoParams,
+    BatchDeleteConfigInfoParams,
     CloneConfigParams,
     DeleteConfigInfoParams,
     GetConfigByParamsReq,
@@ -61,7 +62,6 @@ export const ConfigInfoService = {
         try {
             const resp = await ConfigInfoAPI.Update(config_id, params);
             if (resp.code === 200) {
-                Toast.success('更新配置文件成功');
                 return true;
             } else if (resp.code === 401) {
                 Toast.error(resp.msg || '没有更新配置的权限');
@@ -79,6 +79,25 @@ export const ConfigInfoService = {
     delete: async (params: DeleteConfigInfoParams) => {
         try {
             const resp = await ConfigInfoAPI.Delete(params);
+            if (resp.code === 200) {
+                Toast.success('删除配置文件成功');
+                return true;
+            } else if (resp.code === 401) {
+                Toast.error(resp.msg || '没有删除配置的权限');
+                return false;
+            }
+            Toast.error(resp.msg || '删除配置文件失败');
+            return false;
+        } catch (err) {
+            Toast.error('网络请求异常');
+            return false;
+        }
+    },
+
+    /** 删除配置 */
+    batchDelete: async (params: BatchDeleteConfigInfoParams) => {
+        try {
+            const resp = await ConfigInfoAPI.BatchDelete(params);
             if (resp.code === 200) {
                 Toast.success('删除配置文件成功');
                 return true;
@@ -155,7 +174,6 @@ export const ConfigInfoService = {
         try {
             const resp = await ConfigInfoAPI.Clone(params);
             if (resp.code === 200) {
-                Toast.success('克隆配置成功');
                 return true;
             }
             Toast.error(resp.msg || '克隆配置失败');
