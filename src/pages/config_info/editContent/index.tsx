@@ -201,7 +201,7 @@ const EditConfigContextPage = () => {
 
                     <div style={{display: "flex", justifyContent: "center"}}>
                         <Resizable
-                            defaultSize={{width: "1150px", height: "350px"}}
+                            defaultSize={{width: "1150px", height: "400px"}}
                         >
                             <MonacoEditor
                                 value={editorContent}
@@ -229,7 +229,7 @@ const EditConfigContextPage = () => {
                                 保存&nbsp;<Shortcut keyCombo="Mod+S"/>
                             </Button>
                             <Button onClick={handleConfirmNavigateBack} style={{marginTop: "20px"}} disabled={loading}>
-                                取消
+                                返回
                             </Button>
                         </div>
                     </div>

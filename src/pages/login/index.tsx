@@ -82,7 +82,7 @@ const Login = () => {
                     rules={[
                         {required: true, message: '账号不能为空'},
                         {
-                            pattern: /^(?:[\w-]+@[\w-]+\.[\w-]{2,4}|[a-zA-Z0-9_-]{4,50})$/,
+                            pattern: /^(?:[\w-]+@[\w-]+\.[\w-]{2,4}|[a-zA-Z0-9._-]{4,50})$/,
                             message: '请输入有效用户名'
                         }
                     ]}
