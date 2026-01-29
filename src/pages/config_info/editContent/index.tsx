@@ -2,8 +2,8 @@ import React, { useRef, useState, useEffect } from "react";
 import { useNavigate, useSearchParams } from "react-router-dom";
 import { ConfigInfoService } from "@/src/services/config_info";
 import MonacoEditor from "react-monaco-editor/lib/editor";
-import { Button, Form, HotKeys, Radio, Resizable, Space, Typography, Modal } from "@douyinfe/semi-ui-19";
-import { IconArrowLeft } from "@douyinfe/semi-icons";
+import { Button, Form, HotKeys, Radio, Space, Typography, Modal } from "@douyinfe/semi-ui-19";
+import { IconArrowLeft, IconFullScreenStroked, IconShrinkScreenStroked } from "@douyinfe/semi-icons";
 import { FormApi } from "@douyinfe/semi-ui-19/lib/es/form";
 import { languageListStore } from "@/src/stores/useLanguageListStore";
 import DiffModal from "@/src/components/DiffModal";
@@ -28,6 +28,7 @@ const EditConfigContextPage = () => {
     const [config_id, setConfigId] = useState('');
     const [loading, setLoading] = useState(true);
     const formApi = useRef<FormApi>(null);
+    const [isFullscreen, setIsFullscreen] = useState(false);
 
     useEffect(() => {
         if (tenant_id && data_id && group_id) {
@@ -109,6 +110,20 @@ const EditConfigContextPage = () => {
         }
     };
 
+    const toggleFullscreen = () => {
+        setIsFullscreen(!isFullscreen);
+    };
+
+    useEffect(() => {
+        const handleEsc = (e: KeyboardEvent) => {
+            if (e.key === 'Escape' && isFullscreen) {
+                setIsFullscreen(false);
+            }
+        };
+        window.addEventListener('keydown', handleEsc);
+        return () => window.removeEventListener('keydown', handleEsc);
+    }, [isFullscreen]);
+
     const handleConfirmSave = async () => {
         if (!config_id) return;
         const formValues = formApi.current?.getValues() || {};
@@ -152,15 +167,20 @@ const EditConfigContextPage = () => {
 
     return (
         <div style={{padding: "10px", maxWidth: "1200px", margin: "0 auto"}}>
-            <div style={{display: "flex", alignItems: "center", marginBottom: "20px"}}>
-                <Button
-                    icon={<IconArrowLeft/>}
-                    theme="borderless"
-                    onClick={handleConfirmNavigateBack}
-                    style={{marginRight: "10px"}}
-                    disabled={loading}
-                />
-                <Typography.Title heading={4}>编辑配置</Typography.Title>
+            <div style={{display: "flex", alignItems: "center", justifyContent: "space-between", marginBottom: "20px"}}>
+                <div style={{display: "flex", alignItems: "center"}}>
+                    <Button
+                        icon={<IconArrowLeft/>}
+                        theme="borderless"
+                        onClick={handleConfirmNavigateBack}
+                        style={{marginRight: "10px"}}
+                        disabled={loading}
+                    />
+                    <Typography.Title heading={4}>编辑配置</Typography.Title>
+                </div>
+                <div style={{color: 'var(--semi-color-text-2)'}}>
+                    最后更新时间: {configContent.create_time}
+                </div>
             </div>
 
             <Form
@@ -200,9 +220,28 @@ const EditConfigContextPage = () => {
                 </Form.RadioGroup>
 
                     <div style={{display: "flex", justifyContent: "center"}}>
-                        <Resizable
-                            defaultSize={{width: "1150px", height: "400px"}}
-                        >
+                        <div style={{
+                            position: isFullscreen ? 'fixed' : 'relative',
+                            top: isFullscreen ? 0 : 'auto',
+                            left: isFullscreen ? 0 : 'auto',
+                            width: isFullscreen ? '100vw' : '1150px',
+                            height: isFullscreen ? '100vh' : '400px',
+                            zIndex: isFullscreen ? 9999 : 'auto',
+                            backgroundColor: isFullscreen ? '#1e1e1e' : 'transparent',
+                        }}>
+                            <Button
+                                icon={isFullscreen ? <IconShrinkScreenStroked/> : <IconFullScreenStroked/>}
+                                theme="borderless"
+                                onClick={toggleFullscreen}
+                                style={{
+                                    position: 'absolute',
+                                    top: '8px',
+                                    right: '8px',
+                                    zIndex: 10,
+                                    color: '#fff',
+                                }}
+                                title={isFullscreen ? '退出全屏 (ESC)' : '全屏'}
+                            />
                             <MonacoEditor
                                 value={editorContent}
                                 onChange={setEditorContent}
@@ -214,7 +253,7 @@ const EditConfigContextPage = () => {
                                     readOnly: loading,
                                 }}
                             />
-                        </Resizable>
+                        </div>
                     </div>
 
                     <div style={{width: "100%"}}>

@@ -36,6 +36,7 @@ export interface ListConfigInfosParams {
   data_id?: string;
   group_id?: string;
   type?: string;
+  create_time?: string;
 }
 
 interface ConfigInfoItem {
@@ -62,6 +63,7 @@ export interface GetConfigContentResp extends CommonResp {
     group_id: string;
     type: string;
     content?: string;
+    create_time?: string;
   }
 }
 

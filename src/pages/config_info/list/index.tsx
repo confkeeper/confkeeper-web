@@ -198,9 +198,26 @@ const ConfigInfoPage = () => {
     };
 
     const columns: any[] = [
-        {title: "Data Id", dataIndex: "data_id"},
-        {title: "Group", dataIndex: "group_id"},
-        {title: "格式", dataIndex: "type"},
+        {
+            title: "Data Id",
+            dataIndex: "data_id",
+            sorter: (a: any, b: any) => a.data_id.localeCompare(b.data_id),
+        },
+        {
+            title: "Group",
+            dataIndex: "group_id",
+            sorter: (a: any, b: any) => a.group_id.localeCompare(b.group_id),
+        },
+        {
+            title: "格式",
+            dataIndex: "type",
+            sorter: (a: any, b: any) => a.type.localeCompare(b.type),
+        },
+        {
+            title: "最后更新时间",
+            dataIndex: "create_time",
+            sorter: (a: any, b: any) => a.create_time.localeCompare(b.create_time),
+        },
         {
             title: "操作",
             dataIndex: "actions",
