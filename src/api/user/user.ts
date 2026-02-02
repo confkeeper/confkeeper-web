@@ -13,13 +13,19 @@ import {
     AddUserResp,
     UpdateUserResp,
     UpdateUserParams,
-    UserInfoResp
+    UserInfoResp,
+    LogoutResp
 } from './types';
 
 
 /** 用户登录 */
 export async function Login(params: LoginParams) {
     return request.Post<LoginResp>('/api/user/login', params);
+}
+
+/** 用户退出登录 */
+export async function Logout() {
+    return request.Post<LogoutResp>('/api/user/logout');
 }
 
 /** 生成验证码 */

@@ -23,6 +23,8 @@ export interface LoginResp extends CommonResp {
   };
 }
 
+export interface LogoutResp extends CommonResp {}
+
 export interface UserListParams {
   page?: number;
   page_size?: number;
