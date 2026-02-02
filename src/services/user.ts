@@ -1,6 +1,6 @@
 import { UserAPI } from '@/src/api/user';
 import { Toast } from '@douyinfe/semi-ui-19';
-import { setToken } from "@/src/utils/auth";
+import { removeToken, setToken } from "@/src/utils/auth";
 import {
     AddUserParams,
     ChangePasswdParams,
@@ -65,6 +65,23 @@ export const UserService = {
             console.error('Login error:', error);
         }
     },
+
+    /** 退出登录 */
+    logout: async () => {
+        try {
+            const resp = await UserAPI.Logout();
+            if (resp.code === 200) {
+                removeToken();
+                Toast.success('退出登录成功');
+            } else {
+                Toast.error(resp.msg || '退出登录失败');
+            }
+        } catch (error) {
+            Toast.error('退出登录失败，请重试');
+            console.error('Login error:', error);
+        }
+    },
+
 
     /** 新增用户 */
     add: async (params: AddUserParams) => {
