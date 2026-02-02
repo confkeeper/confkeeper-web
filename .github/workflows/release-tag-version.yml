@@ -1,0 +1,63 @@
+name: release-tag-version
+
+on:
+  push:
+    tags:
+      - "v*"
+      - "!v*-rc*"
+      - "!v*-dev"
+
+concurrency:
+  group: ${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: false
+
+jobs:
+  build-and-release:
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write
+    steps:
+      - uses: actions/checkout@v6
+        with:
+          repository: ${{ github.repository }}
+          token: ${{ secrets.GITHUB_TOKEN }}
+      
+      - name: Setup pnpm
+        uses: pnpm/action-setup@v4
+        with:
+          version: 9
+      
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+          cache: 'pnpm'
+      
+      - name: Install dependencies
+        run: pnpm install --frozen-lockfile
+
+      - name: Build project
+        run: pnpm run build
+
+      - name: Create dist.zip
+        run: |
+          cd dist
+          zip -r ../dist.zip .
+          cd ..
+
+      - name: Install GH CLI
+        uses: dev-hanz-ops/install-gh-cli-action@v0.2.1
+        with:
+          gh-cli-version: 2.71.2
+
+      - name: Create GitHub release
+        run: |
+          if ! gh release view ${{ github.ref_name }} &>/dev/null; then
+            gh release create ${{ github.ref_name }} \
+            --title "${{ github.ref_name }}" \
+            --notes-from-tag
+          fi
+          gh release delete-asset ${{ github.ref_name }} "dist.zip" --yes 2>/dev/null || true
+          gh release upload ${{ github.ref_name }} dist.zip --clobber
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
