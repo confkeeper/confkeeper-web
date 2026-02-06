@@ -3,7 +3,7 @@
  */
 
 // 中文标点符号正则表达式
-export const CHINESE_PUNCTUATION_REGEX = /[：；，。！？【】（）""''、]/g;
+export const CHINESE_PUNCTUATION_REGEX = /[：；，。！？【】（）“”‘’、]/g;
 
 // 注释行前缀
 const COMMENT_PREFIXES = ['#', ';', '//'];
