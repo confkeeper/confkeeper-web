@@ -17,12 +17,11 @@ const Login = () => {
     const isDemo: boolean = demoStatusStore.getState().is_demo
     let username = '';
     let password = '';
-    let remember_me = false;
+    let remember_me = true;
 
     if (isDemo || process.env.NODE_ENV !== 'production') {
         username = 'admin';
         password = 'admin123456';
-        remember_me = true;
     }
 
     // 生成验证码
@@ -107,6 +106,7 @@ const Login = () => {
                         <Form.Input
                             field="captcha"
                             label="验证码"
+                            initValue={process.env.NODE_ENV !== 'production' ? 'a' : ''}
                             placeholder="请输入验证码"
                             rules={[
                                 {required: true, message: '验证码不能为空'}

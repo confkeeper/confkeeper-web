@@ -27,7 +27,7 @@ const alovaInstance = createAlova({
                 window.location.href = APP_LOGIN_URI;
             }
             const json = await response.json();
-            if (isDev && response.status === 200) console.log(json);
+            isDev && console.log(json);
             return json;
         },
         onError: (err, method) => {

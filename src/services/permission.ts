@@ -15,6 +15,7 @@ export const PermissionService = {
                     page: params.page || 1
                 };
             } else if (resp.code === 401) {
+                Toast.error(resp.msg || '没有权限');
                 return {data: [], total: 0};
             }
             Toast.error(resp.msg || '获取列表失败');
