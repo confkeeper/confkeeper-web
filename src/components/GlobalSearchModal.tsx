@@ -23,6 +23,8 @@ const GlobalSearchModal: React.FC<GlobalSearchModalProps> = ({visible, onCancel,
     const [total, setTotal] = useState(0);
     const pageSize = 10;
 
+    const isComposing = React.useRef(false);
+
     useEffect(() => {
         if (visible) {
             // Reset state when modal opens
@@ -31,9 +33,8 @@ const GlobalSearchModal: React.FC<GlobalSearchModalProps> = ({visible, onCancel,
             setHasSearched(false);
             setPage(1);
             setTotal(0);
-            if (currentTenantId) {
-                setIsCurrentTenant(true);
-            }
+            setIsCurrentTenant(!!currentTenantId);
+            isComposing.current = false;
         }
     }, [visible, currentTenantId]);
 
@@ -57,18 +58,38 @@ const GlobalSearchModal: React.FC<GlobalSearchModalProps> = ({visible, onCancel,
         }
     };
 
+    const handleCompositionStart = () => {
+        isComposing.current = true;
+    };
+
+    const handleCompositionEnd = () => {
+        isComposing.current = false;
+    };
+
     const handleKeyDown = (e: React.KeyboardEvent) => {
         if (e.key === 'Enter') {
-            handleSearch();
+            if (e.nativeEvent.isComposing || isComposing.current) return;
+            handleSearch(1);
         }
+    };
+
+    const handleClear = () => {
+        setKeyword('');
+        setResults([]);
+        setHasSearched(false);
+        setPage(1);
+        setTotal(0);
     };
 
     const renderMatchContent = (content: string) => {
         // Simple highlighting
         if (!keyword) return content;
 
+        // Escape special regex characters
+        const escapedKeyword = keyword.replace(/[.*+?^${}()|[\\\]]/g, '\\$&');
+
         // Split by keyword to highlight
-        const parts = content.split(new RegExp(`(${keyword})`, 'gi'));
+        const parts = content.split(new RegExp(`(${escapedKeyword})`, 'gi'));
         return (
             <span>
                 {parts.map((part, i) =>
@@ -95,8 +116,14 @@ const GlobalSearchModal: React.FC<GlobalSearchModalProps> = ({visible, onCancel,
                     prefix={<IconSearch/>}
                     placeholder="输入关键字搜索配置内容..."
                     value={keyword}
-                    onChange={(val) => setKeyword(val)}
+                    onChange={(val) => {
+                        setKeyword(val);
+                        if (!val) handleClear();
+                    }}
                     onKeyDown={handleKeyDown}
+                    onCompositionStart={handleCompositionStart}
+                    onCompositionEnd={handleCompositionEnd}
+                    onClear={handleClear}
                     style={{flex: 1}}
                     showClear
                 />
