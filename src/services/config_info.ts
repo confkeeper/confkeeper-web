@@ -9,7 +9,9 @@ import {
     GetConfigContentResp,
     GetVersionParams,
     ListConfigInfosParams,
-    UpdateConfigInfoParams
+    UpdateConfigInfoParams,
+    SearchConfigParams,
+    SearchConfigResp
 } from '@/src/api/config_info/types';
 import { ConfigInfoAPI } from '@/src/api/config_info';
 import { Toast } from '@douyinfe/semi-ui-19';
@@ -212,6 +214,27 @@ export const ConfigInfoService = {
         } catch (err) {
             Toast.error('获取支持语言列表失败');
             return [];
+        }
+    },
+
+    /** 搜索配置 */
+    search: async (params: SearchConfigParams): Promise<Partial<SearchConfigResp>> => {
+        try {
+            const resp = await ConfigInfoAPI.Search(params);
+            if (resp.code === 200) {
+                return resp;
+            }
+            Toast.error(resp.msg || '搜索配置失败');
+            return {
+                data: [],
+                total: 0
+            };
+        } catch (err) {
+            Toast.error('网络请求异常');
+            return {
+                data: [],
+                total: 0
+            };
         }
     },
 };

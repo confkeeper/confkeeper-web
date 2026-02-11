@@ -5,9 +5,10 @@ import useService from "@/src/hooks/useService";
 
 import { ConfigInfoService } from "@/src/services/config_info";
 import { TenantService } from "@/src/services/tenant";
-import { IconRefresh } from "@douyinfe/semi-icons";
+import { IconRefresh, IconSearch } from "@douyinfe/semi-icons";
 import { Link, useSearchParams } from "react-router-dom";
 import type { ConfigInfo } from "@/src/types/config_info";
+import GlobalSearchModal from "@/src/components/GlobalSearchModal";
 
 const ConfigInfoPage = () => {
     const [searchParams, setSearchParams] = useSearchParams();
@@ -36,7 +37,7 @@ const ConfigInfoPage = () => {
         type: initialType || undefined,
     });
 
-    const tenantResponse = useService(() => TenantService.list({page: 1, page_size: 100}), []);
+    const tenantResponse = useService(() => TenantService.list({ page: 1, page_size: 100 }), []);
     const tenantList = tenantResponse[0]?.data?.data || [];
 
     React.useEffect(() => {
@@ -96,6 +97,7 @@ const ConfigInfoPage = () => {
         [key: string]: { data_id: string; group_id: string }
     }>({});
     const cloneFormApi = useRef<FormApi>(null);
+    const [globalSearchVisible, setGlobalSearchVisible] = useState(false);
 
     const handleDelete = async (id: string) => {
         Modal.confirm({
@@ -402,6 +404,14 @@ const ConfigInfoPage = () => {
                             新增
                         </Button>
                         <Button
+                            icon={<IconSearch />}
+                            theme="solid"
+                            type="secondary"
+                            onClick={() => setGlobalSearchVisible(true)}
+                        >
+                            全局搜索
+                        </Button>
+                        <Button
                             type="secondary"
                             theme="solid"
                             onClick={() => {
@@ -584,6 +594,11 @@ const ConfigInfoPage = () => {
                     </div>
                 </Form>
             </Modal>
+            <GlobalSearchModal
+                visible={globalSearchVisible}
+                onCancel={() => setGlobalSearchVisible(false)}
+                currentTenantId={tenantId}
+            />
         </div>
     );
 };

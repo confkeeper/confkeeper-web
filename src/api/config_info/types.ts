@@ -124,3 +124,28 @@ export interface LanguageListResp extends CommonResp {
         languages: string[];
     }
 }
+
+export interface SearchConfigParams {
+  keyword: string;
+  tenant_id?: string;
+  page?: number;
+  page_size?: number;
+}
+
+export interface SearchConfigMatch {
+  line_no: number;
+  content: string;
+}
+
+export interface SearchConfigResultData {
+  config_id: number;
+  data_id: string;
+  group_id: string;
+  tenant_id: string;
+  matches: SearchConfigMatch[];
+}
+
+export interface SearchConfigResp extends CommonResp {
+  total: number;
+  data: SearchConfigResultData[];
+}

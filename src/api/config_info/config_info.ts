@@ -1,25 +1,27 @@
 import { request } from '@/src/utils/request';
 import {
-    AddConfigInfoParams,
-    AddConfigInfoResp,
-    BatchDeleteConfigInfoParams,
-    BatchDeleteConfigInfoResp,
-    CleanupConfigResp,
-    CloneConfigParams,
-    CloneConfigResp,
-    DeleteConfigInfoParams,
-    DeleteConfigInfoResp,
-    GetConfigByParamsReq,
-    GetConfigByParamsResp,
-    GetConfigContentParams,
-    GetConfigContentResp,
-    GetVersionParams,
-    GetVersionResp,
-    LanguageListResp,
-    ListConfigInfosParams,
-    ListConfigInfosResp,
-    UpdateConfigInfoParams,
-    UpdateConfigInfoResp,
+  AddConfigInfoParams,
+  AddConfigInfoResp,
+  BatchDeleteConfigInfoParams,
+  BatchDeleteConfigInfoResp,
+  CleanupConfigResp,
+  CloneConfigParams,
+  CloneConfigResp,
+  DeleteConfigInfoParams,
+  DeleteConfigInfoResp,
+  GetConfigByParamsReq,
+  GetConfigByParamsResp,
+  GetConfigContentParams,
+  GetConfigContentResp,
+  GetVersionParams,
+  GetVersionResp,
+  LanguageListResp,
+  ListConfigInfosParams,
+  ListConfigInfosResp,
+  SearchConfigParams,
+  SearchConfigResp,
+  UpdateConfigInfoParams,
+  UpdateConfigInfoResp,
 } from './types';
 
 /** 添加配置 */
@@ -34,7 +36,7 @@ export async function Delete(params: DeleteConfigInfoParams) {
 
 /** 批量删除配置 */
 export async function BatchDelete(params: BatchDeleteConfigInfoParams) {
-    return request.Delete<BatchDeleteConfigInfoResp>(`/api/config/batch_delete`, params);
+  return request.Delete<BatchDeleteConfigInfoResp>(`/api/config/batch_delete`, params);
 }
 
 /** 获取配置列表 */
@@ -63,20 +65,27 @@ export async function GetByParams(params: GetConfigByParamsReq) {
 
 /** 获取配置所有版本 */
 export async function GetVersion(params: GetVersionParams) {
-    return request.Get<GetVersionResp>(`/api/config/get_version/${params.config_id}`);
+  return request.Get<GetVersionResp>(`/api/config/get_version/${params.config_id}`);
 }
 
 /** 克隆配置 */
 export async function Clone(params: CloneConfigParams) {
-    return request.Post<CloneConfigResp>(`/api/config/clone`, params);
+  return request.Post<CloneConfigResp>(`/api/config/clone`, params);
 }
 
 /** 删除旧配置 */
 export async function Cleanup() {
-    return request.Post<CleanupConfigResp>('/api/config/cleanup');
+  return request.Post<CleanupConfigResp>('/api/config/cleanup');
 }
 
 /** 获取支持语言列表 */
 export async function GetLanguage() {
-    return request.Get<LanguageListResp>('/api/config/language_list');
+  return request.Get<LanguageListResp>('/api/config/language_list');
+}
+
+/** 搜索配置 */
+export async function Search(params: SearchConfigParams) {
+  return request.Get<SearchConfigResp>('/api/config/search', {
+    params: params
+  });
 }
