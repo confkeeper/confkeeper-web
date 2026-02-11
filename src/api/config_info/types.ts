@@ -138,7 +138,7 @@ export interface SearchConfigMatch {
 }
 
 export interface SearchConfigResultData {
-  config_id: number;
+  config_id: string;
   data_id: string;
   group_id: string;
   tenant_id: string;
