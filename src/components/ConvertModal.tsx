@@ -20,10 +20,12 @@ const convertPropertiesFormat = (content: string): string => {
         }
 
         // 解析key和value
-        const [key, value] = line.split('=');
-        if (!key || value === undefined) {
+        const separatorIndex = line.indexOf('=');
+        if (separatorIndex <= 0) {
             return line;
         }
+        const key = line.substring(0, separatorIndex);
+        const value = line.substring(separatorIndex + 1);
 
         const originalKey = key.trim();
 
