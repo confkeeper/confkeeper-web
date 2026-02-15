@@ -160,5 +160,21 @@ export const UserService = {
             Toast.error('网络请求异常');
             return "";
         }
+    },
+
+    /** 同步LDAP用户 */
+    syncLDAPUsers: async () => {
+        try {
+            const resp = await UserAPI.SyncLDAPUsers();
+            if (resp.code === 200) {
+                Toast.success(`同步成功，共同步 ${resp.data?.synced_users} 个用户，LDAP中共有 ${resp.data?.total_ldap_users} 个用户`);
+                return resp.data;
+            }
+            Toast.error(resp.msg || '同步失败');
+            return null;
+        } catch (err) {
+            Toast.error('网络请求异常');
+            return null;
+        }
     }
 };

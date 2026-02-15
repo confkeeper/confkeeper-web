@@ -14,7 +14,8 @@ import {
     UpdateUserResp,
     UpdateUserParams,
     UserInfoResp,
-    LogoutResp
+    LogoutResp,
+    SyncLDAPUsersResp
 } from './types';
 
 
@@ -63,4 +64,9 @@ export async function Update(user_id: number, params: UpdateUserParams) {
 /** 用户信息 */
 export async function Info(user_id: string) {
     return request.Get<UserInfoResp>(`/api/user/info/${user_id}`);
+}
+
+/** 同步LDAP用户 */
+export async function SyncLDAPUsers() {
+    return request.Post<SyncLDAPUsersResp>('/api/user/sync-ldap');
 }
