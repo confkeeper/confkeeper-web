@@ -9,6 +9,7 @@ import { languageListStore } from "@/src/stores/useLanguageListStore";
 import DiffModal from "@/src/components/DiffModal";
 import CompareConfigModal from "@/src/components/CompareConfigModal";
 import VersionCompareModal from "@/src/components/VersionCompareModal";
+import ConvertModal from "@/src/components/ConvertModal";
 
 const EditConfigContextPage = () => {
     const navigate = useNavigate();
@@ -50,6 +51,7 @@ const EditConfigContextPage = () => {
     const [diffModalVisible, setDiffModalVisible] = useState(false);
     const [compareModalVisible, setCompareModalVisible] = useState(false);
     const [versionCompareModalVisible, setVersionCompareModalVisible] = useState(false);
+    const [convertModalVisible, setConvertModalVisible] = useState(false);
     const [compareContent, setCompareContent] = useState("");
 
     const handleSave = () => {
@@ -145,6 +147,22 @@ const EditConfigContextPage = () => {
             maskClosable: false,
             hasCancel: false,
         });
+    };
+
+    // 处理转换按钮点击
+    const handleConvert = () => {
+        setConvertModalVisible(true);
+    };
+
+    // 处理转换确认
+    const handleConvertConfirm = (convertedContent: string) => {
+        setEditorContent(convertedContent);
+        setConvertModalVisible(false);
+    };
+
+    // 处理关闭转换模态框
+    const handleCloseConvertModal = () => {
+        setConvertModalVisible(false);
     };
 
     // 插件不支持properties格式，暂时使用ini格式代替
@@ -258,6 +276,11 @@ const EditConfigContextPage = () => {
 
                     <div style={{width: "100%"}}>
                         <div style={{display: "flex", justifyContent: "flex-end", gap: "10px"}}>
+                            {configContent.type === 'properties' && (
+                                <Button onClick={handleConvert} style={{marginTop: "20px"}} disabled={loading}>
+                                    转换格式
+                                </Button>
+                            )}
                             <Button onClick={handleCompare} style={{marginTop: "20px"}} disabled={loading}>
                                 配置对比
                             </Button>
@@ -312,6 +335,13 @@ const EditConfigContextPage = () => {
                 oldContent={compareContent || (configContent as any).content || ''}
                 newContent={editorContent || ''}
                 fileName={(configContent as any).group_id || 'config'}
+            />
+            <ConvertModal
+                visible={convertModalVisible}
+                onClose={handleCloseConvertModal}
+                onConfirm={handleConvertConfirm}
+                originalContent={editorContent}
+                configType={configContent.type}
             />
         </div>
     );
