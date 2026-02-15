@@ -164,7 +164,7 @@ const SettingPage = () => {
                 size="small"
             >
                 <div className="text-center py-4">
-                    <IconDelete
+                    <IconSync
                         size="extra-large"
                         className="text-blue-500 mb-4"
                     />
