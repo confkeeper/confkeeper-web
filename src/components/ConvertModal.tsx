@@ -115,9 +115,7 @@ const ConvertModal: React.FC<ConvertModalProps> = ({
                             minimap: {enabled: false},
                         }}
                         onChange={(value) => {
-                            if (value) {
-                                setEditedContent(value);
-                            }
+                            setEditedContent(value);
                         }}
                     />
                 </div>
