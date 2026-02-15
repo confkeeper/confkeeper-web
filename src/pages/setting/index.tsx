@@ -1,13 +1,16 @@
 import React, { useState } from "react";
 import { Card, Button, Modal, Space, Typography } from "@douyinfe/semi-ui-19";
-import { IconDelete, IconSetting } from "@douyinfe/semi-icons";
+import { IconDelete, IconSetting, IconSync } from "@douyinfe/semi-icons";
 import { ConfigInfoService } from "@/src/services/config_info";
+import { UserService } from "@/src/services/user";
 
 const { Title, Text } = Typography;
 
 const SettingPage = () => {
     const [cleanupModalVisible, setCleanupModalVisible] = useState(false);
     const [cleanupLoading, setCleanupLoading] = useState(false);
+    const [syncLDAPModalVisible, setSyncLDAPModalVisible] = useState(false);
+    const [syncLDAPLoading, setSyncLDAPLoading] = useState(false);
 
     const handleCleanup = async () => {
         setCleanupLoading(true);
@@ -21,11 +24,23 @@ const SettingPage = () => {
         }
     };
 
+    const handleSyncLDAP = async () => {
+        setSyncLDAPLoading(true);
+        try {
+            const data = await UserService.syncLDAPUsers();
+            if (data) {
+                setSyncLDAPModalVisible(false);
+            }
+        } finally {
+            setSyncLDAPLoading(false);
+        }
+    };
+
     return (
         <div className="p-6 bg-(--semi-color-bg-1) min-h-screen">
             <div className="w-[90%] mx-auto">
                 <Title heading={3} className="mb-6">
-                    <IconSetting className="mr-2" />
+                    <IconSetting className="mr-2"/>
                     系统设置
                 </Title>
 
@@ -34,7 +49,7 @@ const SettingPage = () => {
                     <Card
                         title={
                             <div className="flex items-center">
-                                <IconDelete className="mr-2 text-red-500" />
+                                <IconDelete className="mr-2 text-red-500"/>
                                 配置管理
                             </div>
                         }
@@ -46,18 +61,47 @@ const SettingPage = () => {
                                 <Text type="secondary" className="block mb-4">
                                     清理系统中过期的配置数据，释放存储空间。此操作不可恢复，请谨慎操作。
                                 </Text>
-                                
+
                                 <Button
                                     type="danger"
                                     theme="solid"
-                                    icon={<IconDelete />}
+                                    icon={<IconDelete/>}
                                     onClick={() => setCleanupModalVisible(true)}
                                     className="hover:scale-105 transition-transform"
                                 >
                                     清理旧配置
                                 </Button>
                             </div>
+                        </div>
+                    </Card>
 
+                    {/* 用户管理卡片 */}
+                    <Card
+                        title={
+                            <div className="flex items-center">
+                                <IconSync className="mr-2 text-blue-500"/>
+                                用户管理
+                            </div>
+                        }
+                        className="shadow-sm hover:shadow-md transition-shadow w-full"
+                    >
+                        <div className="space-y-4">
+                            <div>
+                                <Title heading={4} className="!mb-2">同步LDAP用户</Title>
+                                <Text type="secondary" className="block mb-4">
+                                    从LDAP服务器同步所有用户到系统中。此操作会覆盖现有的用户数据，请谨慎操作。
+                                </Text>
+
+                                <Button
+                                    type="primary"
+                                    theme="solid"
+                                    icon={<IconSync/>}
+                                    onClick={() => setSyncLDAPModalVisible(true)}
+                                    className="hover:scale-105 transition-transform"
+                                >
+                                    同步LDAP所有用户
+                                </Button>
+                            </div>
                         </div>
                     </Card>
 
@@ -68,27 +112,27 @@ const SettingPage = () => {
             <Modal
                 title={
                     <div className="flex items-center text-red-600">
-                        <IconDelete className="mr-2" />
+                        <IconDelete className="mr-2"/>
                         确认清理旧配置
                     </div>
                 }
                 visible={cleanupModalVisible}
                 onCancel={() => setCleanupModalVisible(false)}
                 onOk={handleCleanup}
-                okButtonProps={{ 
+                okButtonProps={{
                     loading: cleanupLoading,
                     type: 'danger'
                 }}
-                cancelButtonProps={{ disabled: cleanupLoading }}
+                cancelButtonProps={{disabled: cleanupLoading}}
                 centered
                 size="small"
             >
                 <div className="text-center py-4">
-                    <IconDelete 
-                        size="extra-large" 
-                        className="text-yellow-500 mb-4" 
+                    <IconDelete
+                        size="extra-large"
+                        className="text-yellow-500 mb-4"
                     />
-                    <Title heading={4} className="!mb-2 text-gray-800">
+                    <Title heading={4} className="mb-2! text-gray-800">
                         确定要清理旧配置吗？
                     </Title>
                     <Text type="secondary" className="block mb-4">
@@ -96,6 +140,39 @@ const SettingPage = () => {
                     </Text>
                     <Text type="danger" strong>
                         注意：此操作不可撤销，请确保您已备份重要数据。
+                    </Text>
+                </div>
+            </Modal>
+
+            {/* 同步LDAP确认弹窗 */}
+            <Modal
+                title={
+                    <div className="flex items-center text-primary">
+                        <IconDelete className="mr-2"/>
+                        确认同步LDAP用户
+                    </div>
+                }
+                visible={syncLDAPModalVisible}
+                onCancel={() => setSyncLDAPModalVisible(false)}
+                onOk={handleSyncLDAP}
+                okButtonProps={{
+                    loading: syncLDAPLoading,
+                    type: 'primary'
+                }}
+                cancelButtonProps={{disabled: syncLDAPLoading}}
+                centered
+                size="small"
+            >
+                <div className="text-center py-4">
+                    <IconDelete
+                        size="extra-large"
+                        className="text-blue-500 mb-4"
+                    />
+                    <Title heading={4} className="mb-2! text-gray-800">
+                        确定要同步LDAP所有用户吗？
+                    </Title>
+                    <Text type="secondary" className="block mb-4">
+                        此操作将从LDAP服务器同步所有用户到系统中，可能会覆盖现有的用户数据。
                     </Text>
                 </div>
             </Modal>

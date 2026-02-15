@@ -80,3 +80,12 @@ export interface UserInfoResp extends CommonResp {
     enable?: boolean;
   }
 }
+
+export interface SyncLDAPUsersData {
+  synced_users: number;
+  total_ldap_users: number;
+}
+
+export interface SyncLDAPUsersResp extends CommonResp {
+  data?: SyncLDAPUsersData;
+}
