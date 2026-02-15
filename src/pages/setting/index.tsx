@@ -148,7 +148,7 @@ const SettingPage = () => {
             <Modal
                 title={
                     <div className="flex items-center text-primary">
-                        <IconDelete className="mr-2"/>
+                        <IconSync className="mr-2"/>
                         确认同步LDAP用户
                     </div>
                 }
