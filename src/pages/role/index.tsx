@@ -1,12 +1,14 @@
 import React, { useRef, useState } from "react";
-import { Table, Button, Modal, Form } from "@douyinfe/semi-ui-19";
+import { Table, Button, Modal, Form, Tag } from "@douyinfe/semi-ui-19";
 import useService from "@/src/hooks/useService";
 import { ColumnProps } from "@douyinfe/semi-ui-19/lib/es/table";
 import { FormApi } from "@douyinfe/semi-ui-19/lib/es/form";
 import { IconRefresh } from "@douyinfe/semi-icons";
 import { RoleService } from "@/src/services/role";
-import { AddRoleParams } from "@/src/api/role/types";
+import { UserService } from "@/src/services/user";
+import { AddRoleParams, EditRoleParams, RoleInfo } from "@/src/api/role/types";
 import { getUserid } from "@/src/utils/auth";
+import { UserInfo } from "@/src/api/user/types";
 
 const RolePage = () => {
     const [pageSize, setPageSize] = useState<number>(12);
@@ -19,10 +21,47 @@ const RolePage = () => {
     const {data, loading} = serviceResponse[0];
     const refresh = serviceResponse[1];
     const [visible, setVisible] = useState(false);
-    const [modalType, setModalType] = useState<'create'>('create');
-    const [modalRecord, setModalRecord] = useState<any>();
+    const [modalType, setModalType] = useState<'create' | 'edit'>('create');
+    const [modalRecord, setModalRecord] = useState<RoleInfo | undefined>();
     const [okLoading, setOkLoading] = useState(false)
     const formApi = useRef<FormApi>(null);
+
+    const [userList, setUserList] = useState<UserInfo[]>([]);
+    const [userPage, setUserPage] = useState(1);
+    const [userTotal, setUserTotal] = useState(0);
+    const [userLoading, setUserLoading] = useState(false);
+
+    const fetchUserList = async (page: number = 1, reset: boolean = false) => {
+        if (userLoading) return;
+        setUserLoading(true);
+        try {
+            const res = await UserService.list({page, page_size: 50});
+            if (res.data) {
+                if (reset) {
+                    setUserList(res.data);
+                } else {
+                    setUserList(prev => {
+                        const newUsers = res.data || [];
+                        const existingIds = new Set(prev.map(u => u.username));
+                        return [...prev, ...newUsers.filter(u => !existingIds.has(u.username))];
+                    });
+                }
+                setUserTotal(res.total || 0);
+                setUserPage(page);
+            }
+        } finally {
+            setUserLoading(false);
+        }
+    };
+
+    const handleUserScroll = (e: React.UIEvent<HTMLDivElement>) => {
+        const target = e.target as HTMLDivElement;
+        if (target.scrollTop + target.clientHeight >= target.scrollHeight - 10) {
+            if (userList.length < userTotal && !userLoading) {
+                fetchUserList(userPage + 1);
+            }
+        }
+    };
 
     const handleDelete = async (role: string) => {
         Modal.confirm({
@@ -35,13 +74,23 @@ const RolePage = () => {
         });
     };
 
+    const handleEdit = async (record: RoleInfo) => {
+        setModalType('edit');
+        setModalRecord({...record});
+        setVisible(true);
+        setUserList([]);
+        fetchUserList(1, true);
+    };
+
     const handleSubmit = async () => {
         if (!formApi.current) return;
         const values = await formApi.current.validate();
         setOkLoading(true);
         try {
             if (modalType === 'create') {
-                await RoleService.add(values as AddRoleParams);
+                await RoleService.add({role: values.role, usernames: values.usernames} as AddRoleParams);
+            } else {
+                await RoleService.edit({role: values.role, usernames: values.usernames} as EditRoleParams);
             }
             refresh();
             setVisible(false);
@@ -50,26 +99,49 @@ const RolePage = () => {
         }
     };
 
-    const openCreateModal = () => {
+    const openCreateModal = async () => {
         setModalType('create');
         setModalRecord(undefined);
         setVisible(true);
+        setUserList([]);
+        fetchUserList(1, true);
     };
 
     const columns: ColumnProps[] = [
-        {title: "角色名", width: '40%', dataIndex: "role"},
-        {title: "用户名", width: '40%', dataIndex: "username"},
+        {title: "角色名", width: '30%', dataIndex: "role"},
+        {
+            title: "包含用户",
+            width: '50%',
+            dataIndex: "usernames",
+            render: (usernames: string[]) => {
+                return (
+                    <div className="flex flex-wrap gap-1">
+                        {usernames?.map(u => <Tag key={u} color="blue">{u}</Tag>)}
+                    </div>
+                );
+            }
+        },
         {
             title: "操作",
             dataIndex: "actions",
             align: 'center',
-            render: (_text: string, record: any) => {
+            render: (_text: string, record: RoleInfo) => {
+                const isAdmin = getUserid().toString() === '1';
                 return (
                     <div className="flex items-center justify-center gap-2">
+                        <Button
+                            type="primary"
+                            theme="light"
+                            onClick={() => handleEdit(record)}
+                            disabled={!isAdmin}
+                        >
+                            编辑
+                        </Button>
                         <Button
                             type="danger"
                             theme="solid"
                             onClick={() => handleDelete(record.role)}
+                            disabled={!isAdmin}
                         >
                             删除
                         </Button>
@@ -120,7 +192,7 @@ const RolePage = () => {
             </div>
             <Modal
                 title={
-                    modalType === 'create' ? '新增角色' : '编辑角色信息'
+                    modalType === 'create' ? '新增角色' : '编辑角色成员'
                 }
                 size="large"
                 visible={visible}
@@ -139,13 +211,17 @@ const RolePage = () => {
                         field='role'
                         label='角色名'
                         rules={[{required: true, message: '请输入角色名'}]}
+                        disabled={modalType === 'edit'}
                         showClear
                     />
-                    <Form.Input
-                        field='username'
-                        label='用户名'
-                        rules={[{required: true, message: '请输入用户名'}]}
-                        showClear
+                    <Form.Select
+                        field='usernames'
+                        label={modalType === 'create' ? '用户名' : '包含用户'}
+                        multiple
+                        rules={[{required: true, message: '请选择至少一个用户'}]}
+                        style={{width: '100%'}}
+                        optionList={userList.map(u => ({label: u.username, value: u.username}))}
+                        onListScroll={handleUserScroll}
                     />
                 </Form>
             </Modal>
@@ -154,3 +230,4 @@ const RolePage = () => {
 };
 
 export default RolePage;
+

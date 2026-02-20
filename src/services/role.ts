@@ -1,4 +1,9 @@
-import { AddRoleParams, DeleteRoleParams, RoleListParams } from '@/src/api/role/types';
+import {
+    AddRoleParams,
+    DeleteRoleParams,
+    EditRoleParams,
+    RoleListParams
+} from '@/src/api/role/types';
 import { RoleAPI } from '@/src/api/role';
 import { Toast } from '@douyinfe/semi-ui-19';
 
@@ -35,6 +40,22 @@ export const RoleService = {
                 return true;
             }
             Toast.error(resp.msg || '添加失败');
+            return false;
+        } catch (err) {
+            Toast.error('网络请求异常');
+            return false;
+        }
+    },
+
+    /** 修改角色 */
+    edit: async (params: EditRoleParams) => {
+        try {
+            const resp = await RoleAPI.Edit(params);
+            if (resp.code === 200) {
+                Toast.success('编辑成功');
+                return true;
+            }
+            Toast.error(resp.msg || '编辑失败');
             return false;
         } catch (err) {
             Toast.error('网络请求异常');
