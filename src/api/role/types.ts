@@ -2,7 +2,7 @@ import { CommonResp } from "@/src/api/common.type";
 
 export interface AddRoleParams {
   role: string;
-  username: string;
+  usernames: string[];
 }
 
 export interface RoleListParams {
@@ -10,8 +10,15 @@ export interface RoleListParams {
   page_size: number;
 }
 
+export interface EditRoleParams {
+  role: string;
+  usernames: string[];
+}
+
+export interface EditRoleResp extends CommonResp {}
+
 export interface RoleInfo {
-  username: string;
+  usernames: string[];
   role: string;
 }
 
