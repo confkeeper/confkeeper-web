@@ -22,7 +22,7 @@ const RolePage = () => {
     const refresh = serviceResponse[1];
     const [visible, setVisible] = useState(false);
     const [modalType, setModalType] = useState<'create' | 'edit'>('create');
-    const [modalRecord, setModalRecord] = useState<any>();
+    const [modalRecord, setModalRecord] = useState<RoleInfo | undefined>();
     const [okLoading, setOkLoading] = useState(false)
     const formApi = useRef<FormApi>(null);
 
