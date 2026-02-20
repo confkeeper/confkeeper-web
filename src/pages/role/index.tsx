@@ -6,7 +6,7 @@ import { FormApi } from "@douyinfe/semi-ui-19/lib/es/form";
 import { IconRefresh } from "@douyinfe/semi-icons";
 import { RoleService } from "@/src/services/role";
 import { UserService } from "@/src/services/user";
-import { AddRoleParams, EditRoleParams } from "@/src/api/role/types";
+import { AddRoleParams, EditRoleParams, RoleInfo } from "@/src/api/role/types";
 import { getUserid } from "@/src/utils/auth";
 import { UserInfo } from "@/src/api/user/types";
 
@@ -27,11 +27,39 @@ const RolePage = () => {
     const formApi = useRef<FormApi>(null);
 
     const [userList, setUserList] = useState<UserInfo[]>([]);
+    const [userPage, setUserPage] = useState(1);
+    const [userTotal, setUserTotal] = useState(0);
+    const [userLoading, setUserLoading] = useState(false);
 
-    const fetchUserList = async () => {
-        if (userList.length === 0) {
-            const res = await UserService.list({page: 1, page_size: 1000});
-            if (res.data) setUserList(res.data);
+    const fetchUserList = async (page: number = 1, reset: boolean = false) => {
+        if (userLoading) return;
+        setUserLoading(true);
+        try {
+            const res = await UserService.list({page, page_size: 50});
+            if (res.data) {
+                if (reset) {
+                    setUserList(res.data);
+                } else {
+                    setUserList(prev => {
+                        const newUsers = res.data || [];
+                        const existingIds = new Set(prev.map(u => u.username));
+                        return [...prev, ...newUsers.filter(u => !existingIds.has(u.username))];
+                    });
+                }
+                setUserTotal(res.total || 0);
+                setUserPage(page);
+            }
+        } finally {
+            setUserLoading(false);
+        }
+    };
+
+    const handleUserScroll = (e: React.UIEvent<HTMLDivElement>) => {
+        const target = e.target as HTMLDivElement;
+        if (target.scrollTop + target.clientHeight >= target.scrollHeight - 10) {
+            if (userList.length < userTotal && !userLoading) {
+                fetchUserList(userPage + 1);
+            }
         }
     };
 
@@ -46,11 +74,12 @@ const RolePage = () => {
         });
     };
 
-    const handleEdit = async (record: any) => {
-        await fetchUserList();
+    const handleEdit = async (record: RoleInfo) => {
         setModalType('edit');
         setModalRecord({...record});
         setVisible(true);
+        setUserList([]);
+        fetchUserList(1, true);
     };
 
     const handleSubmit = async () => {
@@ -71,10 +100,11 @@ const RolePage = () => {
     };
 
     const openCreateModal = async () => {
-        await fetchUserList();
         setModalType('create');
         setModalRecord(undefined);
         setVisible(true);
+        setUserList([]);
+        fetchUserList(1, true);
     };
 
     const columns: ColumnProps[] = [
@@ -95,7 +125,7 @@ const RolePage = () => {
             title: "操作",
             dataIndex: "actions",
             align: 'center',
-            render: (_text: string, record: any) => {
+            render: (_text: string, record: RoleInfo) => {
                 const isAdmin = getUserid().toString() === '1';
                 return (
                     <div className="flex items-center justify-center gap-2">
@@ -191,6 +221,7 @@ const RolePage = () => {
                         rules={[{required: true, message: '请选择至少一个用户'}]}
                         style={{width: '100%'}}
                         optionList={userList.map(u => ({label: u.username, value: u.username}))}
+                        onListScroll={handleUserScroll}
                     />
                 </Form>
             </Modal>
