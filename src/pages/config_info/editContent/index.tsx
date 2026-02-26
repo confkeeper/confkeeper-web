@@ -10,6 +10,7 @@ import DiffModal from "@/src/components/DiffModal";
 import CompareConfigModal from "@/src/components/CompareConfigModal";
 import VersionCompareModal from "@/src/components/VersionCompareModal";
 import ConvertModal from "@/src/components/ConvertModal";
+import { getUsername } from "@/src/utils/auth";
 
 const EditConfigContextPage = () => {
     const navigate = useNavigate();
@@ -184,7 +185,27 @@ const EditConfigContextPage = () => {
     }
 
     return (
-        <div style={{padding: "10px", maxWidth: "1200px", margin: "0 auto"}}>
+        <div style={{padding: "10px", maxWidth: "1200px", margin: "0 auto", position: "relative"}}>
+            {/* 水印组件 */}
+            <div className="fixed top-0 left-0 w-full h-full pointer-events-none z-10000">
+                <div className="w-full h-full grid grid-cols-3 grid-rows-5 gap-y-4">
+                    {(() => {
+                        const username = getUsername();
+                        return Array.from({length: 15}).map((_, index) => (
+                            <div
+                                key={index}
+                                className="transform -rotate-45 font-bold text-center whitespace-nowrap text-gray-400 dark:text-gray-500 opacity-20 flex items-center justify-center text-xs"
+                            >
+                                <div className="space-y-0.5">
+                                    <div>{username}</div>
+                                    <div>{data_id || ''}</div>
+                                    <div>{group_id || ''}</div>
+                                </div>
+                            </div>
+                        ));
+                    })()}
+                </div>
+            </div>
             <div style={{display: "flex", alignItems: "center", justifyContent: "space-between", marginBottom: "20px"}}>
                 <div style={{display: "flex", alignItems: "center"}}>
                     <Button
@@ -212,30 +233,30 @@ const EditConfigContextPage = () => {
                     </Form.Section>
 
                     <Form.Input
-                    field="data_id"
-                    label="Data Id"
-                    placeholder="请输入配置名称"
-                    style={{width: "1100px"}}
-                    disabled={loading}
-                    showClear
-                />
+                        field="data_id"
+                        label="Data Id"
+                        placeholder="请输入配置名称"
+                        style={{width: "1100px"}}
+                        disabled={loading}
+                        showClear
+                    />
 
                     <Form.Input
-                    field="group_id"
-                    label="Group"
-                    placeholder="请输入配置描述"
-                    style={{width: "1100px"}}
-                    disabled={loading}
-                    showClear
-                />
+                        field="group_id"
+                        label="Group"
+                        placeholder="请输入配置描述"
+                        style={{width: "1100px"}}
+                        disabled={loading}
+                        showClear
+                    />
 
                     <Form.RadioGroup field="type" label="配置类型" style={{width: "1100px"}} disabled={loading}>
-                    {languageListStore.getState().languages.map((type) => (
-                        <Radio key={type} value={type} onChange={() => setConfigContent({...configContent, type})}>
-                            {type}
-                        </Radio>
-                    ))}
-                </Form.RadioGroup>
+                        {languageListStore.getState().languages.map((type) => (
+                            <Radio key={type} value={type} onChange={() => setConfigContent({...configContent, type})}>
+                                {type}
+                            </Radio>
+                        ))}
+                    </Form.RadioGroup>
 
                     <div style={{display: "flex", justifyContent: "center"}}>
                         <div style={{
