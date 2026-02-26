@@ -10,6 +10,7 @@ import DiffModal from "@/src/components/DiffModal";
 import CompareConfigModal from "@/src/components/CompareConfigModal";
 import VersionCompareModal from "@/src/components/VersionCompareModal";
 import ConvertModal from "@/src/components/ConvertModal";
+import { getUsername } from "@/src/utils/auth";
 
 const EditConfigContextPage = () => {
     const navigate = useNavigate();
@@ -184,7 +185,27 @@ const EditConfigContextPage = () => {
     }
 
     return (
-        <div style={{padding: "10px", maxWidth: "1200px", margin: "0 auto"}}>
+        <div style={{padding: "10px", maxWidth: "1200px", margin: "0 auto", position: "relative"}}>
+            {/* 水印组件 */}
+            <div className="absolute top-0 left-0 w-full h-full pointer-events-none z-10">
+                <div className="w-full h-full grid grid-cols-3 grid-rows-5 gap-y-4">
+                    {Array.from({ length: 15 }).map((_, index) => (
+                        <div
+                            key={index}
+                            className="transform -rotate-45 font-bold text-center whitespace-nowrap text-gray-400 dark:text-gray-500 opacity-20 flex items-center justify-center"
+                            style={{
+                                fontSize: "12px"
+                            }}
+                        >
+                            <div className="space-y-0.5">
+                                <div className="text-xs">{getUsername()}</div>
+                                <div className="text-xs">{data_id || ''}</div>
+                                <div className="text-xs">{group_id || ''}</div>
+                            </div>
+                        </div>
+                    ))}
+                </div>
+            </div>
             <div style={{display: "flex", alignItems: "center", justifyContent: "space-between", marginBottom: "20px"}}>
                 <div style={{display: "flex", alignItems: "center"}}>
                     <Button
