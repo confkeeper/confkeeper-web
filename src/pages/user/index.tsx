@@ -5,7 +5,6 @@ import { ColumnProps } from "@douyinfe/semi-ui-19/lib/es/table";
 import { FormApi } from "@douyinfe/semi-ui-19/lib/es/form";
 import { IconRefresh } from "@douyinfe/semi-icons";
 import { UserService } from "@/src/services/user";
-import ChangePasswordModal from "@/src/components/ChangePasswordModal";
 import { AddUserParams } from "@/src/api/user/types";
 import { getUserid } from "@/src/utils/auth";
 
@@ -26,12 +25,6 @@ const UserPage = () => {
     const [modalRecord, setModalRecord] = useState<any>();
     const [okLoading, setOkLoading] = useState(false)
     const formApi = useRef<FormApi>(null);
-    const changePasswordRef = useRef<{ open: (userId: string) => void }>(null);
-
-    // 显示弹窗
-    const changePasswd = (userId: string) => {
-        changePasswordRef.current?.open(userId);
-    };
 
     const handleDelete = async (id: string) => {
         Modal.confirm({
@@ -90,8 +83,6 @@ const UserPage = () => {
                 return (
                     <div className="flex items-center justify-center gap-2">
                         <Button type="primary" theme='solid' onClick={() => editInfo(record)}>编辑</Button>
-                        <Button type="primary" theme='solid'
-                                onClick={() => changePasswd(record.user_id)}>修改密码</Button>
                         <Button
                             type="danger"
                             theme="solid"
@@ -192,6 +183,12 @@ const UserPage = () => {
                         rules={[{required: true, message: '请输入用户名'}]}
                         showClear
                     />
+                    <Form.Input
+                        field='password'
+                        label='密码'
+                        rules={[{message: '请输入密码'}, {min: 6, message: '密码至少6位字符'}]}
+                        showClear
+                    />
                     {modalType === 'edit' ? (
                         <>
                             {Number(modalRecord?.user_id) !== 1 && (
@@ -204,7 +201,6 @@ const UserPage = () => {
                     ) : null}
                 </Form>
             </Modal>
-            <ChangePasswordModal ref={changePasswordRef}/>
         </div>
     );
 };
