@@ -85,6 +85,12 @@ export default function Layout() {
                         header={{
                             logo: (
                                 <div
+                                    onMouseDown={(e) => {
+                                        if (e.button === 1) {
+                                            e.preventDefault();
+                                            window.open(APP_LOGIN_REDIRECT_URI, '_blank');
+                                        }
+                                    }}
                                     onClick={() => navigate(APP_LOGIN_REDIRECT_URI)}
                                     style={{cursor: 'pointer', display: 'flex', alignItems: 'center'}}
                                 >
@@ -93,6 +99,12 @@ export default function Layout() {
                             ),
                             text: (
                                 <div
+                                    onMouseDown={(e) => {
+                                        if (e.button === 1) {
+                                            e.preventDefault();
+                                            window.open(APP_LOGIN_REDIRECT_URI, '_blank');
+                                        }
+                                    }}
                                     onClick={() => navigate(APP_LOGIN_REDIRECT_URI)}
                                     style={{cursor: 'pointer', fontWeight: 500}}
                                 >
@@ -136,6 +148,18 @@ export default function Layout() {
                                 items={MenuRoutes}
                                 onSelect={(data) => onSelect(data)}
                                 defaultOpenKeys={defaultOpenKeys}
+                                renderWrapper={({ itemElement, props }) => {
+                                    return React.cloneElement(itemElement, {
+                                        onMouseDown: (e) => {
+                                            if (e.button === 1) {
+                                                e.preventDefault();
+                                                if (props.itemKey) {
+                                                    window.open(props.itemKey, '_blank');
+                                                }
+                                            }
+                                        }
+                                    });
+                                }}
                                 footer={{
                                     collapseButton: true,
                                 }}/>
