@@ -148,6 +148,18 @@ export default function Layout() {
                                 items={MenuRoutes}
                                 onSelect={(data) => onSelect(data)}
                                 defaultOpenKeys={defaultOpenKeys}
+                                renderWrapper={({ itemElement, props }) => {
+                                    return React.cloneElement(itemElement, {
+                                        onMouseDown: (e) => {
+                                            if (e.button === 1) {
+                                                e.preventDefault();
+                                                if (props.itemKey) {
+                                                    window.open(props.itemKey, '_blank');
+                                                }
+                                            }
+                                        }
+                                    });
+                                }}
                                 footer={{
                                     collapseButton: true,
                                 }}/>
