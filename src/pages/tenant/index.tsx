@@ -1,8 +1,8 @@
 import React, { useRef, useState } from "react";
-import { Table, Button, Modal, Form } from "@douyinfe/semi-ui-19";
+import { Table, Button, Modal, Form } from '@douyinfe/semi-ui';
 import useService from "@/src/hooks/useService";
-import { ColumnProps } from "@douyinfe/semi-ui-19/lib/es/table";
-import { FormApi } from "@douyinfe/semi-ui-19/lib/es/form";
+import { ColumnProps } from "@douyinfe/semi-ui/lib/es/table";
+import { FormApi } from "@douyinfe/semi-ui/lib/es/form";
 import { TenantService } from "@/src/services/tenant";
 import { getUserid } from "@/src/utils/auth";
 
@@ -140,6 +140,7 @@ const TenantPage = () => {
                 onCancel={() => setVisible(false)}
                 onOk={handleSubmit}
                 okButtonProps={{loading: okLoading}}
+                maskClosable={false}
             >
                 <Form
                     labelPosition='left'

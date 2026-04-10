@@ -1,4 +1,4 @@
-import { Banner, Layout, Nav } from '@douyinfe/semi-ui-19';
+import { Banner, Layout, Nav } from '@douyinfe/semi-ui';
 import { Outlet } from 'react-router-dom';
 import { APP_NAME, DEMO_WARNING_TIP } from "@/src/config";
 import Footer from "@/src/pages/layout/Footer";

@@ -14,7 +14,7 @@ import {
     SearchConfigResp
 } from '@/src/api/config_info/types';
 import { ConfigInfoAPI } from '@/src/api/config_info';
-import { Toast } from '@douyinfe/semi-ui-19';
+import { Toast } from '@douyinfe/semi-ui';
 
 /** 配置服务 */
 export const ConfigInfoService = {

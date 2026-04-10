@@ -1,6 +1,6 @@
-import { FaRegCopyright } from "react-icons/fa";
+
 import React, { useEffect, useState } from "react";
-import { Layout } from "@douyinfe/semi-ui-19";
+import { Layout } from '@douyinfe/semi-ui';
 import { APP_START_YEAR } from "@/src/config";
 import { SimpleApiService } from "@/src/services/simple_api";
 
@@ -21,7 +21,7 @@ export default function Index() {
         <Layout.Footer className='flex items-center justify-center w-full gap-2'>
             <p className="mb-1 flex items-center justify-center">
                 {version}
-                <FaRegCopyright className="ml-1 mr-1 text-sm"/>
+                ©
                 {year === APP_START_YEAR ? APP_START_YEAR : `${APP_START_YEAR} - ${year}`}
                 <a
                     href="https://github.com/buyfakett"

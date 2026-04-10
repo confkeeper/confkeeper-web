@@ -1,6 +1,6 @@
 import React, { forwardRef, useImperativeHandle, useRef, useState } from "react";
-import { Modal, Form } from "@douyinfe/semi-ui-19";
-import { FormApi } from "@douyinfe/semi-ui-19/lib/es/form";
+import { Modal, Form } from '@douyinfe/semi-ui';
+import { FormApi } from "@douyinfe/semi-ui/lib/es/form";
 import { UserService } from "@/src/services/user";
 import { IconKey } from "@douyinfe/semi-icons";
 import { ChangePasswdParams } from "@/src/api/user/types";
@@ -48,6 +48,7 @@ const ChangePasswordModal = forwardRef<ChangePasswordModalRef, ChangePasswordMod
                 onCancel={() => setVisible(false)}
                 onOk={handleSubmit}
                 okButtonProps={{loading: okLoading}}
+                maskClosable={false}
             >
                 <Form
                     labelPosition="left"

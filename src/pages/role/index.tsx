@@ -1,8 +1,8 @@
 import React, { useRef, useState } from "react";
-import { Table, Button, Modal, Form, Tag } from "@douyinfe/semi-ui-19";
+import { Table, Button, Modal, Form, Tag } from '@douyinfe/semi-ui';
 import useService from "@/src/hooks/useService";
-import { ColumnProps } from "@douyinfe/semi-ui-19/lib/es/table";
-import { FormApi } from "@douyinfe/semi-ui-19/lib/es/form";
+import { ColumnProps } from "@douyinfe/semi-ui/lib/es/table";
+import { FormApi } from "@douyinfe/semi-ui/lib/es/form";
 import { IconRefresh } from "@douyinfe/semi-icons";
 import { RoleService } from "@/src/services/role";
 import { UserService } from "@/src/services/user";
@@ -199,6 +199,7 @@ const RolePage = () => {
                 onCancel={() => setVisible(false)}
                 onOk={handleSubmit}
                 okButtonProps={{loading: okLoading}}
+                maskClosable={false}
             >
                 <Form
                     labelPosition='left'
@@ -218,6 +219,7 @@ const RolePage = () => {
                         field='usernames'
                         label={modalType === 'create' ? '用户名' : '包含用户'}
                         multiple
+                        filter
                         rules={[{required: true, message: '请选择至少一个用户'}]}
                         style={{width: '100%'}}
                         optionList={userList.map(u => ({label: u.username, value: u.username}))}

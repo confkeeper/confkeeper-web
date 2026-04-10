@@ -1,8 +1,8 @@
 import React, { useState, useEffect, useRef } from 'react';
-import { Modal, Form, Button, Space } from '@douyinfe/semi-ui-19';
+import { Modal, Form, Button, Space } from '@douyinfe/semi-ui';
 import { TenantService } from '@/src/services/tenant';
 import { ConfigInfoService } from '@/src/services/config_info';
-import { FormApi } from '@douyinfe/semi-ui-19/lib/es/form';
+import { FormApi } from '@douyinfe/semi-ui/lib/es/form';
 import MonacoDiffEditor from 'react-monaco-editor/lib/diff';
 
 interface CompareConfigModalProps {
@@ -117,6 +117,7 @@ const CompareConfigModal: React.FC<CompareConfigModalProps> = ({
                 )
             }
             width={showDiff ? 1200 : 500}
+            maskClosable={false}
         >
             {showDiff ? (
                 (currentContent || '') === (compareContent || '') ? (
@@ -165,6 +166,7 @@ const CompareConfigModal: React.FC<CompareConfigModalProps> = ({
                         loading={tenantLoading}
                         rules={[{required: true, message: '请选择命名空间'}]}
                         style={{width: '100%'}}
+                        filter
                     />
                     <Form.Input
                         field="data_id"

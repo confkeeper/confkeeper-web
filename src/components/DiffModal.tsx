@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { Modal, Button } from '@douyinfe/semi-ui-19';
+import { Modal, Button } from '@douyinfe/semi-ui';
 import MonacoDiffEditor from 'react-monaco-editor/lib/diff';
 import {
     createChinesePunctuationDecorations,
@@ -59,6 +59,7 @@ const DiffModal: React.FC<DiffModalProps> = ({
                     </Button>
                 </div>
             }
+            maskClosable={false}
         >
             {isSame ? (
                 <div style={{

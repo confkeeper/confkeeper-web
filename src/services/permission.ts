@@ -1,6 +1,6 @@
 import { AddPermissionParams, DeletePermissionParams, PermissionListParams } from '@/src/api/permission/types';
 import { PermissionAPI } from '@/src/api/permission';
-import { Toast } from '@douyinfe/semi-ui-19';
+import { Toast } from '@douyinfe/semi-ui';
 
 /** 权限服务 */
 export const PermissionService = {

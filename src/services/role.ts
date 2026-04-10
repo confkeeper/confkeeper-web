@@ -5,7 +5,7 @@ import {
     RoleListParams
 } from '@/src/api/role/types';
 import { RoleAPI } from '@/src/api/role';
-import { Toast } from '@douyinfe/semi-ui-19';
+import { Toast } from '@douyinfe/semi-ui';
 
 /** 角色服务 */
 export const RoleService = {
