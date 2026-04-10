@@ -1,5 +1,5 @@
 import React, { useState } from "react";
-import { Card, Button, Modal, Space, Typography } from "@douyinfe/semi-ui-19";
+import { Card, Button, Modal, Space, Typography } from '@douyinfe/semi-ui';
 import { IconDelete, IconSetting, IconSync } from "@douyinfe/semi-icons";
 import { ConfigInfoService } from "@/src/services/config_info";
 import { UserService } from "@/src/services/user";
@@ -126,6 +126,7 @@ const SettingPage = () => {
                 cancelButtonProps={{disabled: cleanupLoading}}
                 centered
                 size="small"
+                maskClosable={false}
             >
                 <div className="text-center py-4">
                     <IconDelete
@@ -162,6 +163,7 @@ const SettingPage = () => {
                 cancelButtonProps={{disabled: syncLDAPLoading}}
                 centered
                 size="small"
+                maskClosable={false}
             >
                 <div className="text-center py-4">
                     <IconSync

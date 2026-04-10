@@ -1,6 +1,6 @@
 import { AddTenantParams, DeleteTenantParams, ListTenantsParams } from '@/src/api/tenant/types';
 import { TenantAPI } from '@/src/api/tenant';
-import { Toast } from '@douyinfe/semi-ui-19';
+import { Toast } from '@douyinfe/semi-ui';
 
 /** 命名空间服务 */
 export const TenantService = {

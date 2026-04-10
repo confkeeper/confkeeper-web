@@ -1,8 +1,8 @@
 import React, { useRef, useState } from "react";
-import { Table, Button, Modal, Form, Input, Switch, Select } from "@douyinfe/semi-ui-19";
+import { Table, Button, Modal, Form, Input, Switch, Select } from '@douyinfe/semi-ui';
 import useService from "@/src/hooks/useService";
-import { ColumnProps } from "@douyinfe/semi-ui-19/lib/es/table";
-import { FormApi } from "@douyinfe/semi-ui-19/lib/es/form";
+import { ColumnProps } from "@douyinfe/semi-ui/lib/es/table";
+import { FormApi } from "@douyinfe/semi-ui/lib/es/form";
 import { IconRefresh } from "@douyinfe/semi-icons";
 import { UserService } from "@/src/services/user";
 import { AddUserParams } from "@/src/api/user/types";
@@ -114,6 +114,7 @@ const UserPage = () => {
                             onChange={value => setEnableInput(value === 'true')}
                             placeholder='启用状态'
                             style={{width: 250}}
+                            filter
                         >
                             <Select.Option value='true'>启用</Select.Option>
                             <Select.Option value='false'>禁用</Select.Option>
@@ -169,6 +170,7 @@ const UserPage = () => {
                 onCancel={() => setVisible(false)}
                 onOk={handleSubmit}
                 okButtonProps={{loading: okLoading}}
+                maskClosable={false}
             >
                 <Form
                     labelPosition='left'

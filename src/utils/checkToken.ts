@@ -1,7 +1,7 @@
 import { jwtDecode } from 'jwt-decode';
 import { getToken, removeToken } from '@/src/utils/auth';
 import { APP_LOGIN_URI, CHECK_TOKEN_TIME_INTERVAL } from '@/src/config';
-import { Toast } from "@douyinfe/semi-ui-19";
+import { Toast } from '@douyinfe/semi-ui';
 
 /**
  * 判断 token 是否过期

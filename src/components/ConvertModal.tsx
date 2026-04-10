@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { Modal, Button } from '@douyinfe/semi-ui-19';
+import { Modal, Button } from '@douyinfe/semi-ui';
 import MonacoDiffEditor from 'react-monaco-editor/lib/diff';
 
 interface ConvertModalProps {
@@ -83,6 +83,7 @@ const ConvertModal: React.FC<ConvertModalProps> = ({
                     </Button>
                 </div>
             }
+            maskClosable={false}
         >
             <div style={{
                 height: '60vh',

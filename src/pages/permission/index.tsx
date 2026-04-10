@@ -1,8 +1,8 @@
 import React, { useRef, useState } from "react";
-import { Table, Button, Modal, Form, Input, Select } from "@douyinfe/semi-ui-19";
+import { Table, Button, Modal, Form, Input, Select } from '@douyinfe/semi-ui';
 import useService from "@/src/hooks/useService";
-import { ColumnProps } from "@douyinfe/semi-ui-19/lib/es/table";
-import { FormApi } from "@douyinfe/semi-ui-19/lib/es/form";
+import { ColumnProps } from "@douyinfe/semi-ui/lib/es/table";
+import { FormApi } from "@douyinfe/semi-ui/lib/es/form";
 import { IconRefresh } from "@douyinfe/semi-icons";
 import { PermissionService } from "@/src/services/permission";
 import { RoleService } from "@/src/services/role";
@@ -202,6 +202,7 @@ const PermissionPage = () => {
                 onCancel={() => setVisible(false)}
                 onOk={handleSubmit}
                 okButtonProps={{loading: okLoading}}
+                maskClosable={false}
             >
                 <Form
                     labelPosition='left'
@@ -217,6 +218,7 @@ const PermissionPage = () => {
                         placeholder="请选择角色名"
                         style={{ width: 300 }}
                         showClear
+                        filter
                     >
                         {roleOptions.map(option => (
                             <Select.Option key={option.value} value={option.value}>
@@ -231,6 +233,7 @@ const PermissionPage = () => {
                         placeholder="请选择资源"
                         style={{ width: 300 }}
                         showClear
+                        filter
                     >
                         {tenantOptions.map(option => (
                             <Select.Option key={option.value} value={option.value}>
@@ -245,6 +248,7 @@ const PermissionPage = () => {
                         placeholder="请选择操作"
                         style={{ width: 300 }}
                         showClear
+                        filter
                     >
                         <Select.Option value="r">r</Select.Option>
                         <Select.Option value="w">w</Select.Option>

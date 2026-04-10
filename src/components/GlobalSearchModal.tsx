@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { Modal, Input, Checkbox, List, Spin, Empty, Typography, Tag, Button, Pagination } from '@douyinfe/semi-ui-19';
+import { Modal, Input, Checkbox, List, Spin, Empty, Typography, Tag, Button, Pagination } from '@douyinfe/semi-ui';
 import { IconSearch } from '@douyinfe/semi-icons';
 import { ConfigInfoService } from '@/src/services/config_info';
 import { SearchConfigResultData } from '@/src/api/config_info/types';
@@ -110,6 +110,7 @@ const GlobalSearchModal: React.FC<GlobalSearchModalProps> = ({visible, onCancel,
             size="large"
             style={{height: '80vh', display: 'flex', flexDirection: 'column'}}
             bodyStyle={{flex: 1, overflow: 'hidden', display: 'flex', flexDirection: 'column', padding: '24px'}}
+            maskClosable={false}
         >
             <div style={{marginBottom: 16, display: 'flex', gap: 16, alignItems: 'center'}}>
                 <Input

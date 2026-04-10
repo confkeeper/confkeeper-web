@@ -1,7 +1,7 @@
 import React, { useState, useEffect, useRef } from 'react';
-import { Modal, Form, Button, Space, Select } from '@douyinfe/semi-ui-19';
+import { Modal, Form, Button, Space, Select } from '@douyinfe/semi-ui';
 import { ConfigInfoService } from '@/src/services/config_info';
-import { FormApi } from '@douyinfe/semi-ui-19/lib/es/form';
+import { FormApi } from '@douyinfe/semi-ui/lib/es/form';
 import MonacoDiffEditor from 'react-monaco-editor/lib/diff';
 
 interface VersionCompareModalProps {
@@ -145,6 +145,7 @@ const VersionCompareModal: React.FC<VersionCompareModalProps> = ({
                 )
             }
             width={showDiff ? 1200 : 500}
+            maskClosable={false}
         >
             {showDiff ? (
                 (currentContent || '') === (compareContent || '') ? (
@@ -184,6 +185,7 @@ const VersionCompareModal: React.FC<VersionCompareModalProps> = ({
                         loading={versionLoading}
                         rules={[{required: true, message: '请选择版本'}]}
                         style={{width: '100%'}}
+                        filter
                     >
                         {versionOptions.map(option => (
                             <Select.Option key={option.value} value={option.value}>

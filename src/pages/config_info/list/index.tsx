@@ -1,6 +1,6 @@
 import React, { useRef, useState } from "react";
-import { Table, Button, Modal, Form, Input, Select, Toast } from "@douyinfe/semi-ui-19";
-import type { FormApi } from '@douyinfe/semi-ui-19/lib/es/form/interface';
+import { Table, Button, Modal, Form, Input, Select, Toast } from '@douyinfe/semi-ui';
+import type { FormApi } from '@douyinfe/semi-ui/lib/es/form/interface';
 import useService from "@/src/hooks/useService";
 
 import { ConfigInfoService } from "@/src/services/config_info";
@@ -361,6 +361,7 @@ const ConfigInfoPage = () => {
                             style={{width: 400}}
                             placeholder="类型"
                             showClear
+                            filter
                         >
                             <Select.Option value="text">text</Select.Option>
                             <Select.Option value="json">json</Select.Option>
@@ -495,6 +496,7 @@ const ConfigInfoPage = () => {
                 onCancel={() => setVisible(false)}
                 onOk={handleSubmit}
                 okButtonProps={{loading: okLoading}}
+                maskClosable={false}
             >
                 <Form
                     labelPosition='left'
@@ -529,6 +531,7 @@ const ConfigInfoPage = () => {
                 }}
                 onOk={handleClone}
                 okButtonProps={{loading: cloneLoading, disabled: !cloneTargetTenantId}}
+                maskClosable={false}
             >
                 <Form
                     layout="vertical"
@@ -552,6 +555,7 @@ const ConfigInfoPage = () => {
                         style={{width: '100%'}}
                         rules={[{required: true, message: '请选择目标命名空间'}]}
                         showClear
+                        filter
                     />
 
                     <div style={{marginTop: '16px'}}>

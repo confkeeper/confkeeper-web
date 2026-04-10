@@ -1,16 +1,16 @@
 import React, { Suspense, useEffect, useRef, useState } from "react";
-import { Dropdown, Form, Layout as MainLayout, Modal, Nav, Spin } from "@douyinfe/semi-ui-19";
+import { Dropdown, Form, Layout as MainLayout, Modal, Nav, Spin } from '@douyinfe/semi-ui';
 import { Outlet, useLocation, useNavigate } from "react-router-dom";
 import { AnimatePresence, motion } from "motion/react";
 import { defaultOpenKeys, MenuRoutes } from "@/src/router/routes";
-import { OnSelectedData } from "@douyinfe/semi-ui-19/lib/es/navigation";
-import { getUserid, getUsername, removeToken } from "@/src/utils/auth";
+import { OnSelectedData } from "@douyinfe/semi-ui/lib/es/navigation";
+import { getUserid, getUsername } from "@/src/utils/auth";
 import { APP_LOGIN_REDIRECT_URI, APP_LOGIN_URI, APP_NAME } from "@/src/config";
 import Footer from "@/src/pages/layout/Footer";
 import ChangePasswordModal from "@/src/components/ChangePasswordModal";
 import SwitchThemeButton from "@/src/components/SwitchThemeButton";
 import { UserService } from "@/src/services/user";
-import { FormApi } from "@douyinfe/semi-ui-19/lib/es/form";
+import { FormApi } from "@douyinfe/semi-ui/lib/es/form";
 // @ts-ignore
 import logo from "@/src/images/confkeeper.png"
 
@@ -193,6 +193,7 @@ export default function Layout() {
                 onCancel={() => setVisible(false)}
                 onOk={handleSubmit}
                 okButtonProps={{loading: okLoading}}
+                maskClosable={false}
             >
                 <Form
                     labelPosition='left'
