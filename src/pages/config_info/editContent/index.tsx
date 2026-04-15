@@ -2,7 +2,7 @@ import React, { useRef, useState, useEffect } from "react";
 import { useNavigate, useSearchParams } from "react-router-dom";
 import { ConfigInfoService } from "@/src/services/config_info";
 import MonacoEditor from "react-monaco-editor/lib/editor";
-import { Button, Form, HotKeys, Radio, Space, Typography, Modal } from '@douyinfe/semi-ui';
+import { Button, Form, HotKeys, Radio, Space, Typography, Modal, Switch } from '@douyinfe/semi-ui';
 import { IconArrowLeft, IconFullScreenStroked, IconShrinkScreenStroked } from "@douyinfe/semi-icons";
 import { FormApi } from "@douyinfe/semi-ui/lib/es/form";
 import { languageListStore } from "@/src/stores/useLanguageListStore";
@@ -31,6 +31,7 @@ const EditConfigContextPage = () => {
     const [loading, setLoading] = useState(true);
     const formApi = useRef<FormApi>(null);
     const [isFullscreen, setIsFullscreen] = useState(false);
+    const [wordWrap, setWordWrap] = useState<'on' | 'off'>('off');
 
     useEffect(() => {
         if (tenant_id && data_id && group_id) {
@@ -268,19 +269,38 @@ const EditConfigContextPage = () => {
                             zIndex: isFullscreen ? 9999 : 'auto',
                             backgroundColor: isFullscreen ? '#1e1e1e' : 'transparent',
                         }}>
-                            <Button
-                                icon={isFullscreen ? <IconShrinkScreenStroked/> : <IconFullScreenStroked/>}
-                                theme="borderless"
-                                onClick={toggleFullscreen}
-                                style={{
-                                    position: 'absolute',
-                                    top: '8px',
-                                    right: '8px',
-                                    zIndex: 10,
+                            <div style={{
+                                position: 'absolute',
+                                top: '8px',
+                                right: '8px',
+                                zIndex: 10,
+                                display: 'flex',
+                                alignItems: 'center',
+                                gap: '12px',
+                            }}>
+                                <label style={{
+                                    display: 'flex',
+                                    alignItems: 'center',
+                                    gap: '8px',
                                     color: '#fff',
-                                }}
-                                title={isFullscreen ? '退出全屏 (ESC)' : '全屏'}
-                            />
+                                    fontSize: '13px',
+                                    cursor: 'pointer',
+                                }}>
+                                    <span>自动换行</span>
+                                    <Switch
+                                        checked={wordWrap === 'on'}
+                                        onChange={(checked) => setWordWrap(checked ? 'on' : 'off')}
+                                        size="small"
+                                    />
+                                </label>
+                                <Button
+                                    icon={isFullscreen ? <IconShrinkScreenStroked/> : <IconFullScreenStroked/>}
+                                    theme="borderless"
+                                    onClick={toggleFullscreen}
+                                    style={{color: '#fff'}}
+                                    title={isFullscreen ? '退出全屏 (ESC)' : '全屏'}
+                                />
+                            </div>
                             <MonacoEditor
                                 value={editorContent}
                                 onChange={setEditorContent}
@@ -290,6 +310,7 @@ const EditConfigContextPage = () => {
                                     automaticLayout: true,
                                     minimap: {enabled: false},
                                     readOnly: loading,
+                                    wordWrap: wordWrap,
                                 }}
                             />
                         </div>
