@@ -8,6 +8,7 @@ import { demoStatusStore } from "@/src/stores/useDemoStatusStore";
 import { ConfigInfoService } from "@/src/services/config_info";
 import { languageListStore } from "@/src/stores/useLanguageListStore";
 import { CONFIG_TYPE_LIST } from "@/src/config";
+import { serverInfoStore } from "@/src/stores/useServerInfoStore";
 
 // 异步获取demo状态并设置到store中
 SimpleApiService.get_demo().then(is_demo => {
@@ -25,5 +26,9 @@ ConfigInfoService.get_language().then((resp) => {
     languageListStore.getState().setLanguageList(langList);
 });
 
+SimpleApiService.get_server_info().then((resp) => {
+    serverInfoStore.getState().setServerInfo(resp.data?.version || "1.0.0", resp.data?.ldap || false);
+})
+
 const root = document.getElementById('root');
-ReactDOM.createRoot(root as HTMLElement).render(<App />)
+ReactDOM.createRoot(root as HTMLElement).render(<App/>)

@@ -3,14 +3,16 @@ import { Card, Button, Modal, Space, Typography } from '@douyinfe/semi-ui';
 import { IconDelete, IconSetting, IconSync } from "@douyinfe/semi-icons";
 import { ConfigInfoService } from "@/src/services/config_info";
 import { UserService } from "@/src/services/user";
+import { serverInfoStore } from "@/src/stores/useServerInfoStore";
 
-const { Title, Text } = Typography;
+const {Title, Text} = Typography;
 
 const SettingPage = () => {
     const [cleanupModalVisible, setCleanupModalVisible] = useState(false);
     const [cleanupLoading, setCleanupLoading] = useState(false);
     const [syncLDAPModalVisible, setSyncLDAPModalVisible] = useState(false);
     const [syncLDAPLoading, setSyncLDAPLoading] = useState(false);
+    const ldap: boolean = serverInfoStore.getState().ldap
 
     const handleCleanup = async () => {
         setCleanupLoading(true);
@@ -76,34 +78,36 @@ const SettingPage = () => {
                     </Card>
 
                     {/* 用户管理卡片 */}
-                    <Card
-                        title={
-                            <div className="flex items-center">
-                                <IconSync className="mr-2 text-blue-500"/>
-                                用户管理
-                            </div>
-                        }
-                        className="shadow-sm hover:shadow-md transition-shadow w-full"
-                    >
-                        <div className="space-y-4">
-                            <div>
-                                <Title heading={4} className="!mb-2">同步LDAP用户</Title>
-                                <Text type="secondary" className="block mb-4">
-                                    从LDAP服务器同步所有用户到系统中。此操作会覆盖现有的用户数据，请谨慎操作。
-                                </Text>
+                    {ldap ? (
+                        <Card
+                            title={
+                                <div className="flex items-center">
+                                    <IconSync className="mr-2 text-blue-500"/>
+                                    用户管理
+                                </div>
+                            }
+                            className="shadow-sm hover:shadow-md transition-shadow w-full"
+                        >
+                            <div className="space-y-4">
+                                <div>
+                                    <Title heading={4} className="!mb-2">同步LDAP用户</Title>
+                                    <Text type="secondary" className="block mb-4">
+                                        从LDAP服务器同步所有用户到系统中。此操作会覆盖现有的用户数据，请谨慎操作。
+                                    </Text>
 
-                                <Button
-                                    type="primary"
-                                    theme="solid"
-                                    icon={<IconSync/>}
-                                    onClick={() => setSyncLDAPModalVisible(true)}
-                                    className="hover:scale-105 transition-transform"
-                                >
-                                    同步LDAP所有用户
-                                </Button>
+                                    <Button
+                                        type="primary"
+                                        theme="solid"
+                                        icon={<IconSync/>}
+                                        onClick={() => setSyncLDAPModalVisible(true)}
+                                        className="hover:scale-105 transition-transform"
+                                    >
+                                        同步LDAP所有用户
+                                    </Button>
+                                </div>
                             </div>
-                        </div>
-                    </Card>
+                        </Card>
+                    ) : ''}
 
                 </Space>
             </div>
