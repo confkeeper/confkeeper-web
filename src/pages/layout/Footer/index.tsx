@@ -5,7 +5,7 @@ import { serverInfoStore } from "@/src/stores/useServerInfoStore";
 
 export default function Index() {
     const year = new Date().getFullYear();
-    const version: string = serverInfoStore.getState().version
+    const version = serverInfoStore(state => state.version)
 
     return (
         <Layout.Footer className='flex items-center justify-center w-full gap-2'>
