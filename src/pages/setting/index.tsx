@@ -107,7 +107,7 @@ const SettingPage = () => {
                                 </div>
                             </div>
                         </Card>
-                    ) : ''}
+                    ) : null}
 
                 </Space>
             </div>
