@@ -12,7 +12,7 @@ const SettingPage = () => {
     const [cleanupLoading, setCleanupLoading] = useState(false);
     const [syncLDAPModalVisible, setSyncLDAPModalVisible] = useState(false);
     const [syncLDAPLoading, setSyncLDAPLoading] = useState(false);
-    const ldap: boolean = serverInfoStore.getState().ldap
+    const ldap = serverInfoStore(state => state.ldap)
 
     const handleCleanup = async () => {
         setCleanupLoading(true);
