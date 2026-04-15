@@ -1,10 +1,11 @@
 import { Toast } from '@douyinfe/semi-ui';
-import { GetDemo, ServerInfo } from "@/src/api/simple_api";
+import { GetDemo, GetServerInfoResp, ServerInfo } from "@/src/api/simple_api";
+import { APP_NAME } from "@/src/config";
 
 /** 服务信息 */
 export const SimpleApiService = {
     /** 获取服务信息 */
-    get_server_info: async () => {
+    get_server_info: async (): Promise<Partial<GetServerInfoResp>> => {
         try {
             const resp = await ServerInfo();
             if (resp.code === 200) {
@@ -13,10 +14,22 @@ export const SimpleApiService = {
                 };
             }
             Toast.error(resp.msg || '获取失败');
-            return {data: {}};
+            return {
+                data: {
+                    name: APP_NAME,
+                    version: "1.0.0",
+                    ldap: false
+                }
+            };
         } catch (err) {
             Toast.error('网络请求异常');
-            return {data: {}};
+            return {
+                data: {
+                    name: APP_NAME,
+                    version: "1.0.0",
+                    ldap: false
+                }
+            };
         }
     },
 

@@ -1,22 +1,12 @@
-
-import React, { useEffect, useState } from "react";
+import React from "react";
 import { Layout } from '@douyinfe/semi-ui';
 import { APP_START_YEAR } from "@/src/config";
-import { SimpleApiService } from "@/src/services/simple_api";
+import { serverInfoStore } from "@/src/stores/useServerInfoStore";
 
 export default function Index() {
     const year = new Date().getFullYear();
-    const [version, setVersion] = useState<string>('');
+    const version = serverInfoStore(state => state.version)
 
-    useEffect(() => {
-        const getServerInfo = async () => {
-            const resp = await SimpleApiService.get_server_info();
-            if (resp.data && 'version' in resp.data) {
-                setVersion(resp.data.version);
-            }
-        }
-        getServerInfo().then(r => {});
-    }, [version]);
     return (
         <Layout.Footer className='flex items-center justify-center w-full gap-2'>
             <p className="mb-1 flex items-center justify-center">
