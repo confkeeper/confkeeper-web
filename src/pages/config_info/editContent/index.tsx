@@ -278,12 +278,13 @@ const EditConfigContextPage = () => {
                                 alignItems: 'center',
                                 gap: '12px',
                             }}>
-                                <div style={{
+                                <label style={{
                                     display: 'flex',
                                     alignItems: 'center',
                                     gap: '8px',
                                     color: '#fff',
                                     fontSize: '13px',
+                                    cursor: 'pointer',
                                 }}>
                                     <span>自动换行</span>
                                     <Switch
@@ -291,7 +292,7 @@ const EditConfigContextPage = () => {
                                         onChange={(checked) => setWordWrap(checked ? 'on' : 'off')}
                                         size="small"
                                     />
-                                </div>
+                                </label>
                                 <Button
                                     icon={isFullscreen ? <IconShrinkScreenStroked/> : <IconFullScreenStroked/>}
                                     theme="borderless"
