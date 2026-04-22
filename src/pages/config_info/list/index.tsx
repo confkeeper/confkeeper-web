@@ -38,7 +38,7 @@ const ConfigInfoPage = () => {
         type: initialType || undefined,
     });
 
-    const tenantResponse = useService(() => TenantService.list({ page: 1, page_size: 100 }), []);
+    const tenantResponse = useService(() => TenantService.list({page: 1, page_size: 100}), []);
     const tenantList = tenantResponse[0]?.data?.data || [];
 
     React.useEffect(() => {
@@ -386,7 +386,7 @@ const ConfigInfoPage = () => {
                             新增
                         </Button>
                         <Button
-                            icon={<IconSearch />}
+                            icon={<IconSearch/>}
                             theme="solid"
                             type="secondary"
                             onClick={() => setGlobalSearchVisible(true)}

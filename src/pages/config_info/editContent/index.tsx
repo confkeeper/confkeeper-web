@@ -25,7 +25,7 @@ const EditConfigContextPage = () => {
         data_id: "",
         group_id: "",
         tenant_id: tenant_id || "",
-        type: "text"
+        type: "properties"
     } as any);
     const [editorContent, setEditorContent] = useState("");
     const [config_id, setConfigId] = useState('');
@@ -55,8 +55,15 @@ const EditConfigContextPage = () => {
                 data_id: "",
                 group_id: "",
                 tenant_id: tenant_id,
-                type: "text"
+                type: "properties"
             });
+            if (formApi.current) {
+                formApi.current.setValues({
+                    data_id: "",
+                    group_id: "",
+                    type: "properties"
+                });
+            }
             setLoading(false);
         }
     }, [config_id, tenant_id, data_id, group_id, isNewConfig]);
@@ -108,7 +115,7 @@ const EditConfigContextPage = () => {
             const hasDataId = formValues.data_id && formValues.data_id.trim() !== '';
             const hasGroupId = formValues.group_id && formValues.group_id.trim() !== '';
             const hasContent = editorContent && editorContent.trim() !== '';
-            const hasTypeChanged = formValues.type && formValues.type !== 'text';
+            const hasTypeChanged = formValues.type && formValues.type !== 'properties';
 
             return hasDataId || hasGroupId || hasContent || hasTypeChanged;
         } else {
@@ -175,7 +182,7 @@ const EditConfigContextPage = () => {
             if (success) {
                 setDiffModalVisible(false);
                 Toast.success('创建成功');
-                navigate(`/edit_content?tenant_id=${tenant_id}&data_id=${formValues.data_id}&group_id=${formValues.group_id}`, { replace: true });
+                navigate(`/edit_content?tenant_id=${tenant_id}&data_id=${formValues.data_id}&group_id=${formValues.group_id}`, {replace: true});
             }
         } else {
             if (!config_id) return;
