@@ -2,7 +2,7 @@ import React, { useRef, useState, useEffect } from "react";
 import { useNavigate, useSearchParams } from "react-router-dom";
 import { ConfigInfoService } from "@/src/services/config_info";
 import MonacoEditor from "react-monaco-editor/lib/editor";
-import { Button, Form, HotKeys, Radio, Space, Typography, Modal, Switch, Toast } from '@douyinfe/semi-ui';
+import { Button, Form, HotKeys, Radio, Space, Typography, Modal, Switch } from '@douyinfe/semi-ui';
 import { IconArrowLeft, IconFullScreenStroked, IconShrinkScreenStroked } from "@douyinfe/semi-icons";
 import { FormApi } from "@douyinfe/semi-ui/lib/es/form";
 import { languageListStore } from "@/src/stores/useLanguageListStore";
@@ -181,7 +181,6 @@ const EditConfigContextPage = () => {
             });
             if (success) {
                 setDiffModalVisible(false);
-                Toast.success('创建成功');
                 navigate(`/edit_content?tenant_id=${tenant_id}&data_id=${formValues.data_id}&group_id=${formValues.group_id}`, {replace: true});
             }
         } else {
