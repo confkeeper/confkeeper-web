@@ -18,7 +18,7 @@ const EditConfigContextPage = () => {
     const tenant_id = searchParams.get('tenant_id');
     const data_id = searchParams.get('data_id');
     const group_id = searchParams.get('group_id');
-    const isNewConfig = !data_id && !group_id;
+    const isNewConfig = !data_id || !group_id;
     const [configContent, setConfigContent] = useState({
         config_id: "",
         content: "",
@@ -180,19 +180,21 @@ const EditConfigContextPage = () => {
                 }
             } else {
                 if (!config_id) return;
-                await ConfigInfoService.update(config_id, payload);
-                setConfigContent((prev: typeof configContent) => ({
-                    ...prev,
-                    content: editorContent
-                }));
-                setDiffModalVisible(false);
-                Modal.success({
-                    title: "提示",
-                    content: "保存成功",
-                    centered: true,
-                    maskClosable: false,
-                    hasCancel: false,
-                });
+                const success = await ConfigInfoService.update(config_id, payload);
+                if (success) {
+                    setConfigContent((prev: typeof configContent) => ({
+                        ...prev,
+                        content: editorContent
+                    }));
+                    setDiffModalVisible(false);
+                    Modal.success({
+                        title: "提示",
+                        content: "保存成功",
+                        centered: true,
+                        maskClosable: false,
+                        hasCancel: false,
+                    });
+                }
             }
         } catch (error) {
             return;
