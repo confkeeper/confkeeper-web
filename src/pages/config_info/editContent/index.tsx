@@ -160,44 +160,42 @@ const EditConfigContextPage = () => {
     }, [isFullscreen]);
 
     const handleConfirmSave = async () => {
-        const formValues = formApi.current?.getValues() || {};
-        const payload = {
-            ...formValues,
-            content: editorContent,
-        };
+        try {
+            const formValues = await formApi.current?.validate();
+            if (!formValues) return;
 
-        if (isNewConfig) {
-            if (!formValues.data_id || !formValues.group_id) {
-                Modal.error({
-                    title: "错误",
-                    content: "请填写 Data Id 和 Group",
-                    centered: true,
+            const payload = {
+                ...formValues,
+                content: editorContent,
+            };
+
+            if (isNewConfig) {
+                const success = await ConfigInfoService.add({
+                    ...payload,
+                    tenant_id: tenant_id || undefined,
                 });
-                return;
-            }
-            const success = await ConfigInfoService.add({
-                ...payload,
-                tenant_id: tenant_id || undefined,
-            });
-            if (success) {
+                if (success) {
+                    setDiffModalVisible(false);
+                    navigate(`/edit_content?tenant_id=${tenant_id}&data_id=${formValues.data_id}&group_id=${formValues.group_id}`, {replace: true});
+                }
+            } else {
+                if (!config_id) return;
+                await ConfigInfoService.update(config_id, payload);
+                setConfigContent((prev: typeof configContent) => ({
+                    ...prev,
+                    content: editorContent
+                }));
                 setDiffModalVisible(false);
-                navigate(`/edit_content?tenant_id=${tenant_id}&data_id=${formValues.data_id}&group_id=${formValues.group_id}`, {replace: true});
+                Modal.success({
+                    title: "提示",
+                    content: "保存成功",
+                    centered: true,
+                    maskClosable: false,
+                    hasCancel: false,
+                });
             }
-        } else {
-            if (!config_id) return;
-            await ConfigInfoService.update(config_id, payload);
-            setConfigContent((prev: typeof configContent) => ({
-                ...prev,
-                content: editorContent
-            }));
-            setDiffModalVisible(false);
-            Modal.success({
-                title: "提示",
-                content: "保存成功",
-                centered: true,
-                maskClosable: false,
-                hasCancel: false,
-            });
+        } catch (error) {
+            return;
         }
     };
 
