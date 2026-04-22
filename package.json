@@ -9,10 +9,10 @@
     "preview": "rsbuild preview"
   },
   "dependencies": {
-    "@douyinfe/semi-icons": "^2.93.0",
-    "@douyinfe/semi-icons-lab": "^2.93.0",
-    "@douyinfe/semi-illustrations": "^2.93.0",
-    "@douyinfe/semi-ui": "^2.93.0",
+    "@douyinfe/semi-icons": "^2.95.1",
+    "@douyinfe/semi-icons-lab": "^2.95.1",
+    "@douyinfe/semi-illustrations": "^2.95.1",
+    "@douyinfe/semi-ui": "^2.95.1",
     "alova": "^3.5.1",
     "jwt-decode": "^4.0.0",
     "monaco-editor-webpack-plugin": "^7.1.1",
@@ -20,19 +20,19 @@
     "react": "^19.2.5",
     "react-dom": "^19.2.5",
     "react-monaco-editor": "^0.59.0",
-    "react-router-dom": "^7.14.0",
+    "react-router-dom": "^7.14.2",
     "zustand": "^5.0.12"
   },
   "devDependencies": {
-    "@rsbuild/core": "2.0.0-rc.1",
-    "@rsbuild/plugin-react": "^1.4.6",
+    "@rsbuild/core": "^2.0.0",
+    "@rsbuild/plugin-react": "^2.0.0",
     "@rsbuild/plugin-sass": "^1.5.1",
-    "@tailwindcss/postcss": "^4.2.2",
+    "@tailwindcss/postcss": "^4.2.4",
     "@types/node": "^24.12.2",
     "@types/react": "^19.2.14",
     "@types/react-dom": "^19.2.3",
     "sass": "^1.99.0",
-    "tailwindcss": "^4.2.2",
-    "typescript": "^6.0.2"
+    "tailwindcss": "^4.2.4",
+    "typescript": "^6.0.3"
   }
 }
