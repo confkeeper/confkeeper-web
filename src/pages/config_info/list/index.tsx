@@ -6,11 +6,12 @@ import useService from "@/src/hooks/useService";
 import { ConfigInfoService } from "@/src/services/config_info";
 import { TenantService } from "@/src/services/tenant";
 import { IconRefresh, IconSearch } from "@douyinfe/semi-icons";
-import { Link, useSearchParams } from "react-router-dom";
+import { Link, useSearchParams, useNavigate } from "react-router-dom";
 import type { ConfigInfo } from "@/src/types/config_info";
 import GlobalSearchModal from "@/src/components/GlobalSearchModal";
 
 const ConfigInfoPage = () => {
+    const navigate = useNavigate();
     const [searchParams, setSearchParams] = useSearchParams();
     const [pageSize, setPageSize] = useState<number>(() => {
         const size = searchParams.get('pageSize');
@@ -84,15 +85,10 @@ const ConfigInfoPage = () => {
     }, [tenantId, pageNum, pageSize, queryParams]);
     const {data, loading} = serviceResponse[0];
     const refresh = serviceResponse[1];
-    const [visible, setVisible] = useState(false);
-    const [modalType, setModalType] = useState<'create' | 'edit'>('create');
-    const [modalRecord, setModalRecord] = useState<any>();
-    const [okLoading, setOkLoading] = useState(false);
     const [selectedRows, setSelectedRows] = useState<any[]>([]);
     const [cloneModalVisible, setCloneModalVisible] = useState(false);
     const [cloneTargetTenantId, setCloneTargetTenantId] = useState<string>('');
     const [cloneLoading, setCloneLoading] = useState(false);
-    const formApi = useRef<FormApi>(null);
     const [modifiedCloneData, setModifiedCloneData] = useState<{
         [key: string]: { data_id: string; group_id: string }
     }>({});
@@ -179,24 +175,9 @@ const ConfigInfoPage = () => {
         setCloneModalVisible(true);
     };
 
-    const handleSubmit = async () => {
-        if (!formApi.current) return;
-        const values = await formApi.current.validate();
-        values.tenant_id = tenantId;
-        setOkLoading(true);
-        try {
-            await ConfigInfoService.add(values);
-            refresh();
-            setVisible(false);
-        } finally {
-            setOkLoading(false);
-        }
-    };
-
     const openCreateModal = () => {
-        setModalType('create');
-        setModalRecord(undefined);
-        setVisible(true);
+        if (!tenantId) return;
+        navigate(`/edit_content?tenant_id=${tenantId}`);
     };
 
     const columns: any[] = [
@@ -487,38 +468,6 @@ const ConfigInfoPage = () => {
                     />
                 </div>
             </div>
-
-            {/* 弹窗 */}
-            <Modal
-                title={modalType === 'create' ? '新增命名空间' : '编辑命名空间信息'}
-                size="large"
-                visible={visible}
-                onCancel={() => setVisible(false)}
-                onOk={handleSubmit}
-                okButtonProps={{loading: okLoading}}
-                maskClosable={false}
-            >
-                <Form
-                    labelPosition='left'
-                    labelAlign='left'
-                    labelWidth={120}
-                    initValues={modalRecord}
-                    getFormApi={(api: any) => (formApi.current = api)}
-                >
-                    <Form.Input
-                        field='data_id'
-                        label='Data Id'
-                        rules={[{required: true, message: '请输入Data Id'}]}
-                        showClear
-                    />
-                    <Form.Input
-                        field='group_id'
-                        label='Group'
-                        rules={[{required: true, message: '请输入Group'}]}
-                        showClear
-                    />
-                </Form>
-            </Modal>
 
             {/* 克隆配置模态框 */}
             <Modal

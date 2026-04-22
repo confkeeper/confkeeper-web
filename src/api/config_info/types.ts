@@ -1,9 +1,11 @@
 import { CommonResp } from "@/src/api/common.type";
 
 export interface AddConfigInfoParams {
-  data_id?: string;
-  group_id?: string;
-  tenant_id?: string;
+    data_id?: string;
+    group_id?: string;
+    tenant_id?: string;
+    content?: string;
+    type?: string;
 }
 
 export interface AddConfigInfoResp extends CommonResp {}

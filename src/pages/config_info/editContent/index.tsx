@@ -2,7 +2,7 @@ import React, { useRef, useState, useEffect } from "react";
 import { useNavigate, useSearchParams } from "react-router-dom";
 import { ConfigInfoService } from "@/src/services/config_info";
 import MonacoEditor from "react-monaco-editor/lib/editor";
-import { Button, Form, HotKeys, Radio, Space, Typography, Modal, Switch } from '@douyinfe/semi-ui';
+import { Button, Form, HotKeys, Radio, Space, Typography, Modal, Switch, Toast } from '@douyinfe/semi-ui';
 import { IconArrowLeft, IconFullScreenStroked, IconShrinkScreenStroked } from "@douyinfe/semi-icons";
 import { FormApi } from "@douyinfe/semi-ui/lib/es/form";
 import { languageListStore } from "@/src/stores/useLanguageListStore";
@@ -18,23 +18,24 @@ const EditConfigContextPage = () => {
     const tenant_id = searchParams.get('tenant_id');
     const data_id = searchParams.get('data_id');
     const group_id = searchParams.get('group_id');
+    const isNewConfig = !data_id && !group_id;
     const [configContent, setConfigContent] = useState({
         config_id: "",
         content: "",
         data_id: "",
         group_id: "",
-        tenant_id: "",
-        type: ""
+        tenant_id: tenant_id || "",
+        type: "text"
     } as any);
     const [editorContent, setEditorContent] = useState("");
     const [config_id, setConfigId] = useState('');
-    const [loading, setLoading] = useState(true);
+    const [loading, setLoading] = useState(!isNewConfig);
     const formApi = useRef<FormApi>(null);
     const [isFullscreen, setIsFullscreen] = useState(false);
     const [wordWrap, setWordWrap] = useState<'on' | 'off'>('off');
 
     useEffect(() => {
-        if (tenant_id && data_id && group_id) {
+        if (!isNewConfig && tenant_id && data_id && group_id) {
             setLoading(true);
             ConfigInfoService.getByParams({tenant_id, data_id, group_id}).then((res) => {
                 const data = res.data || {content: '', data_id: '', group_id: '', tenant_id: '', type: ''};
@@ -47,8 +48,18 @@ const EditConfigContextPage = () => {
             }).finally(() => {
                 setLoading(false);
             });
+        } else if (isNewConfig && tenant_id) {
+            setConfigContent({
+                config_id: "",
+                content: "",
+                data_id: "",
+                group_id: "",
+                tenant_id: tenant_id,
+                type: "text"
+            });
+            setLoading(false);
         }
-    }, [config_id, tenant_id, data_id, group_id]);
+    }, [config_id, tenant_id, data_id, group_id, isNewConfig]);
 
     const [diffModalVisible, setDiffModalVisible] = useState(false);
     const [compareModalVisible, setCompareModalVisible] = useState(false);
@@ -90,9 +101,22 @@ const EditConfigContextPage = () => {
         setDiffModalVisible(true);
     };
 
-    // 检测内容是否发生变更
     const hasContentChanged = () => {
-        return editorContent !== configContent.content;
+        const formValues = formApi.current?.getValues() || {};
+
+        if (isNewConfig) {
+            const hasDataId = formValues.data_id && formValues.data_id.trim() !== '';
+            const hasGroupId = formValues.group_id && formValues.group_id.trim() !== '';
+            const hasContent = editorContent && editorContent.trim() !== '';
+            const hasTypeChanged = formValues.type && formValues.type !== 'text';
+
+            return hasDataId || hasGroupId || hasContent || hasTypeChanged;
+        } else {
+            const contentChanged = editorContent !== configContent.content;
+            const typeChanged = formValues.type !== configContent.type;
+
+            return contentChanged || typeChanged;
+        }
     };
 
     // 处理返回或取消操作的确认逻辑
@@ -129,26 +153,46 @@ const EditConfigContextPage = () => {
     }, [isFullscreen]);
 
     const handleConfirmSave = async () => {
-        if (!config_id) return;
         const formValues = formApi.current?.getValues() || {};
         const payload = {
             ...formValues,
             content: editorContent,
         };
-        await ConfigInfoService.update(config_id, payload);
-        // 更新configContent，将当前编辑器内容作为下次保存的比对基准
-        setConfigContent((prev: typeof configContent) => ({
-            ...prev,
-            content: editorContent
-        }));
-        setDiffModalVisible(false);
-        Modal.success({
-            title: "提示",
-            content: "保存成功",
-            centered: true,
-            maskClosable: false,
-            hasCancel: false,
-        });
+
+        if (isNewConfig) {
+            if (!formValues.data_id || !formValues.group_id) {
+                Modal.error({
+                    title: "错误",
+                    content: "请填写 Data Id 和 Group",
+                    centered: true,
+                });
+                return;
+            }
+            const success = await ConfigInfoService.add({
+                ...payload,
+                tenant_id: tenant_id || undefined,
+            });
+            if (success) {
+                setDiffModalVisible(false);
+                Toast.success('创建成功');
+                navigate(`/edit_content?tenant_id=${tenant_id}&data_id=${formValues.data_id}&group_id=${formValues.group_id}`, { replace: true });
+            }
+        } else {
+            if (!config_id) return;
+            await ConfigInfoService.update(config_id, payload);
+            setConfigContent((prev: typeof configContent) => ({
+                ...prev,
+                content: editorContent
+            }));
+            setDiffModalVisible(false);
+            Modal.success({
+                title: "提示",
+                content: "保存成功",
+                centered: true,
+                maskClosable: false,
+                hasCancel: false,
+            });
+        }
     };
 
     // 处理转换按钮点击
@@ -181,8 +225,8 @@ const EditConfigContextPage = () => {
         return <kbd>{display}</kbd>;
     };
 
-    if (!tenant_id || !data_id || !group_id) {
-        return <div>不存在这个配置</div>;
+    if (!tenant_id) {
+        return <div>缺少租户信息</div>;
     }
 
     return (
@@ -216,7 +260,7 @@ const EditConfigContextPage = () => {
                         style={{marginRight: "10px"}}
                         disabled={loading}
                     />
-                    <Typography.Title heading={4}>编辑配置</Typography.Title>
+                    <Typography.Title heading={4}>{isNewConfig ? '新建配置' : '编辑配置'}</Typography.Title>
                 </div>
                 <div style={{color: 'var(--semi-color-text-2)'}}>
                     最后更新时间: {configContent.create_time}
@@ -238,8 +282,9 @@ const EditConfigContextPage = () => {
                         label="Data Id"
                         placeholder="请输入配置名称"
                         style={{width: "1100px"}}
-                        disabled={loading}
+                        disabled={loading || !isNewConfig}
                         showClear
+                        rules={isNewConfig ? [{required: true, message: '请输入Data Id'}] : undefined}
                     />
 
                     <Form.Input
@@ -247,8 +292,9 @@ const EditConfigContextPage = () => {
                         label="Group"
                         placeholder="请输入配置描述"
                         style={{width: "1100px"}}
-                        disabled={loading}
+                        disabled={loading || !isNewConfig}
                         showClear
+                        rules={isNewConfig ? [{required: true, message: '请输入Group'}] : undefined}
                     />
 
                     <Form.RadioGroup field="type" label="配置类型" style={{width: "1100px"}} disabled={loading}>
