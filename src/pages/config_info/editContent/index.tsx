@@ -47,7 +47,7 @@ const EditConfigContextPage = () => {
         let newContent: string;
 
         if (newLineEnding === 'windows') {
-            newContent = editorContent.replace(/(?<!\r)\n/g, '\r\n');
+            newContent = editorContent.replace(/\r?\n/g, '\r\n');
         } else {
             newContent = editorContent.replace(/\r\n/g, '\n');
         }
