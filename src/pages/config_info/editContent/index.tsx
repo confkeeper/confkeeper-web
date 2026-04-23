@@ -11,6 +11,7 @@ import CompareConfigModal from "@/src/components/CompareConfigModal";
 import VersionCompareModal from "@/src/components/VersionCompareModal";
 import ConvertModal from "@/src/components/ConvertModal";
 import { getUsername } from "@/src/utils/auth";
+import { detectLineEnding, toggleLineEnding as toggleLineEndingUtil, LineEndingType } from "@/src/utils/lineEnding";
 
 const EditConfigContextPage = () => {
     const navigate = useNavigate();
@@ -33,6 +34,13 @@ const EditConfigContextPage = () => {
     const formApi = useRef<FormApi>(null);
     const [isFullscreen, setIsFullscreen] = useState(false);
     const [wordWrap, setWordWrap] = useState<'on' | 'off'>('off');
+    const [lineEnding, setLineEnding] = useState<LineEndingType>('unix');
+
+    const handleToggleLineEnding = () => {
+        const result = toggleLineEndingUtil(editorContent, lineEnding);
+        setEditorContent(result.content);
+        setLineEnding(result.lineEnding);
+    };
 
     useEffect(() => {
         if (!isNewConfig && tenant_id && data_id && group_id) {
@@ -42,6 +50,7 @@ const EditConfigContextPage = () => {
                 setConfigContent({...data, content: data.content || ''});
                 setEditorContent(data.content || "");
                 setConfigId('config_id' in data ? data.config_id : '');
+                setLineEnding(detectLineEnding(data.content || ''));
                 if (formApi.current) {
                     formApi.current.setValues(data);
                 }
@@ -158,6 +167,10 @@ const EditConfigContextPage = () => {
         window.addEventListener('keydown', handleEsc);
         return () => window.removeEventListener('keydown', handleEsc);
     }, [isFullscreen]);
+
+    useEffect(() => {
+        setLineEnding(detectLineEnding(editorContent));
+    }, [editorContent]);
 
     const handleConfirmSave = async () => {
         try {
@@ -330,6 +343,21 @@ const EditConfigContextPage = () => {
                                 alignItems: 'center',
                                 gap: '12px',
                             }}>
+                                <label style={{
+                                    display: 'flex',
+                                    alignItems: 'center',
+                                    gap: '8px',
+                                    color: '#fff',
+                                    fontSize: '13px',
+                                    cursor: 'pointer',
+                                }}>
+                                    <span>换行符: {lineEnding === 'unix' ? 'Unix (LF)' : 'Windows (CRLF)'}</span>
+                                    <Switch
+                                        checked={lineEnding === 'windows'}
+                                        onChange={handleToggleLineEnding}
+                                        size="small"
+                                    />
+                                </label>
                                 <label style={{
                                     display: 'flex',
                                     alignItems: 'center',
