@@ -11,7 +11,7 @@ import CompareConfigModal from "@/src/components/CompareConfigModal";
 import VersionCompareModal from "@/src/components/VersionCompareModal";
 import ConvertModal from "@/src/components/ConvertModal";
 import { getUsername } from "@/src/utils/auth";
-import { detectLineEnding, toggleLineEnding as toggleLineEndingUtil, LineEndingType } from "@/src/utils/lineEnding";
+import { detectLineEnding, toggleLineEnding as toggleLineEndingUtil, LineEndingType, convertLineEnding } from "@/src/utils/lineEnding";
 
 const EditConfigContextPage = () => {
     const navigate = useNavigate();
