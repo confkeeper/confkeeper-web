@@ -11,6 +11,7 @@ import CompareConfigModal from "@/src/components/CompareConfigModal";
 import VersionCompareModal from "@/src/components/VersionCompareModal";
 import ConvertModal from "@/src/components/ConvertModal";
 import { getUsername } from "@/src/utils/auth";
+import { detectLineEnding, toggleLineEnding as toggleLineEndingUtil, LineEndingType } from "@/src/utils/lineEnding";
 
 const EditConfigContextPage = () => {
     const navigate = useNavigate();
@@ -33,27 +34,12 @@ const EditConfigContextPage = () => {
     const formApi = useRef<FormApi>(null);
     const [isFullscreen, setIsFullscreen] = useState(false);
     const [wordWrap, setWordWrap] = useState<'on' | 'off'>('off');
-    const [lineEnding, setLineEnding] = useState<'unix' | 'windows'>('unix');
+    const [lineEnding, setLineEnding] = useState<LineEndingType>('unix');
 
-    const detectLineEnding = (content: string): 'unix' | 'windows' => {
-        if (content.includes('\r\n')) {
-            return 'windows';
-        }
-        return 'unix';
-    };
-
-    const toggleLineEnding = () => {
-        const newLineEnding = lineEnding === 'unix' ? 'windows' : 'unix';
-        let newContent: string;
-
-        if (newLineEnding === 'windows') {
-            newContent = editorContent.replace(/\r?\n/g, '\r\n');
-        } else {
-            newContent = editorContent.replace(/\r\n/g, '\n');
-        }
-
-        setEditorContent(newContent);
-        setLineEnding(newLineEnding);
+    const handleToggleLineEnding = () => {
+        const result = toggleLineEndingUtil(editorContent, lineEnding);
+        setEditorContent(result.content);
+        setLineEnding(result.lineEnding);
     };
 
     useEffect(() => {
@@ -368,7 +354,7 @@ const EditConfigContextPage = () => {
                                     <span>换行符: {lineEnding === 'unix' ? 'Unix (LF)' : 'Windows (CRLF)'}</span>
                                     <Switch
                                         checked={lineEnding === 'windows'}
-                                        onChange={toggleLineEnding}
+                                        onChange={handleToggleLineEnding}
                                         size="small"
                                     />
                                 </label>
