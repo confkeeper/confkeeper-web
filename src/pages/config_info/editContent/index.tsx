@@ -32,6 +32,7 @@ const EditConfigContextPage = () => {
     const [config_id, setConfigId] = useState('');
     const [loading, setLoading] = useState(!isNewConfig);
     const formApi = useRef<FormApi>(null);
+    const editorRef = useRef<any>(null);
     const [isFullscreen, setIsFullscreen] = useState(false);
     const [wordWrap, setWordWrap] = useState<'on' | 'off'>('off');
     const [lineEnding, setLineEnding] = useState<LineEndingType>('unix');
@@ -171,6 +172,22 @@ const EditConfigContextPage = () => {
     useEffect(() => {
         setLineEnding(detectLineEnding(editorContent));
     }, [editorContent]);
+
+    useEffect(() => {
+        const handleFindShortcut = (e: KeyboardEvent) => {
+            if ((e.ctrlKey || e.metaKey) && e.key.toLowerCase() === 'f') {
+                const action = editorRef.current?.getAction('actions.find');
+                if (action) {
+                    e.preventDefault();
+                    e.stopPropagation();
+                    editorRef.current.focus();
+                    action.run();
+                }
+            }
+        };
+        window.addEventListener('keydown', handleFindShortcut, true);
+        return () => window.removeEventListener('keydown', handleFindShortcut, true);
+    }, []);
 
     const handleConfirmSave = async () => {
         try {
@@ -386,6 +403,9 @@ const EditConfigContextPage = () => {
                                 onChange={setEditorContent}
                                 language={getConfigType()}
                                 theme="vs-dark"
+                                editorDidMount={(editor: any) => {
+                                    editorRef.current = editor;
+                                }}
                                 options={{
                                     automaticLayout: true,
                                     minimap: {enabled: false},
