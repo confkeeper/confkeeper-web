@@ -175,12 +175,13 @@ const EditConfigContextPage = () => {
 
     useEffect(() => {
         const handleFindShortcut = (e: KeyboardEvent) => {
-            if ((e.ctrlKey || e.metaKey) && e.key === 'f') {
-                e.preventDefault();
-                e.stopPropagation();
-                if (editorRef.current) {
+            if ((e.ctrlKey || e.metaKey) && e.key.toLowerCase() === 'f') {
+                const action = editorRef.current?.getAction('actions.find');
+                if (action) {
+                    e.preventDefault();
+                    e.stopPropagation();
                     editorRef.current.focus();
-                    editorRef.current.getAction('actions.find').run();
+                    action.run();
                 }
             }
         };
