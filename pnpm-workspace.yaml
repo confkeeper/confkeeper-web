@@ -1,0 +1,14 @@
+allowBuilds:
+  '@parcel/watcher': false
+minimumReleaseAgeExclude:
+  - '@douyinfe/semi-animation-react@2.98.0'
+  - '@douyinfe/semi-animation-styled@2.98.0'
+  - '@douyinfe/semi-animation@2.98.0'
+  - '@douyinfe/semi-foundation@2.98.0'
+  - '@douyinfe/semi-icons-lab@2.98.0'
+  - '@douyinfe/semi-icons@2.98.0'
+  - '@douyinfe/semi-illustrations@2.98.0'
+  - '@douyinfe/semi-json-viewer-core@2.98.0'
+  - '@douyinfe/semi-theme-default@2.98.0'
+  - '@douyinfe/semi-ui@2.98.0'
+  - '@types/react@19.2.15'
