@@ -282,7 +282,7 @@ const MetricsPage: React.FC = () => {
 
                 <div className="grid grid-cols-1 lg:grid-cols-2 gap-4 mt-6">
                     {hasCpuData && (
-                        <Card className="shadow-sm" style={{padding: 0}}>
+                        <Card className="shadow-sm" bodyStyle={{padding: 0}}>
                             <ReactECharts option={cpuChartOption} style={{height: 260, padding: 8}} notMerge
                                           lazyUpdate/>
                         </Card>
