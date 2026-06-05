@@ -16,9 +16,9 @@ const MAX_HISTORY_POINTS = 300; // 5分钟 * 60秒 = 300个点
 const DISPLAY_WINDOW = 5 * 60 * 1000; // 只显示最近5分钟
 
 function formatBytes(bytes: number): string {
-    if (bytes === 0) return '0 B';
+    if (bytes <= 0) return '0 B';
     const units = ['B', 'KB', 'MB', 'GB'];
-    const i = Math.min(Math.floor(Math.log(bytes) / Math.log(1024)), units.length - 1);
+    const i = Math.max(0, Math.min(Math.floor(Math.log(bytes) / Math.log(1024)), units.length - 1));
     return `${(bytes / Math.pow(1024, i)).toFixed(1)} ${units[i]}`;
 }
 
