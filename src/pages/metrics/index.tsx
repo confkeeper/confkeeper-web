@@ -167,16 +167,6 @@ const MetricsPage: React.FC = () => {
                 data: hist.timestamps.map((t, i) => [t, hist.values[i] * 100]),
             });
         }
-        if (series.length === 0) {
-            for (const [key, hist] of rawHistory.entries()) {
-                const name = key.split('{')[0];
-                if (!CPU_METRICS.includes(name)) continue;
-                series.push({
-                    name: 'CPU',
-                    data: hist.timestamps.map((t, i) => [t, hist.values[i] * 100]),
-                });
-            }
-        }
 
         return {
             title: {text: 'CPU 使用率', left: 'center', textStyle: {fontSize: 14}},
