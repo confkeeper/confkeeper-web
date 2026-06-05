@@ -1,7 +1,7 @@
 import React, { ReactElement } from 'react';
 import { RouteObject } from 'react-router-dom';
 import Wrapper from './wrapper';
-import { IconFile, IconPriceTag, IconSetting, IconUser } from '@douyinfe/semi-icons';
+import { IconFile, IconPriceTag, IconSetting, IconUser, IconHistogram } from '@douyinfe/semi-icons';
 
 import Layout from '@/src/pages/layout';
 import LayoutWithTopNav from '@/src/pages/layout/layoutWithTopNav';
@@ -16,6 +16,7 @@ import ConfigInfo from '@/src/pages/config_info/list';
 import EditContent from '@/src/pages/config_info/editContent';
 
 import Setting from '@/src/pages/setting';
+import Metrics from '@/src/pages/metrics';
 
 import NotFond from '@/src/pages/exception/404';
 
@@ -65,6 +66,11 @@ export const MenuRoutes: IRouters[] = [
         icon: <IconSetting/>,
         text: '设置',
     },
+    {
+        itemKey: '/metrics',
+        icon: <IconHistogram/>,
+        text: '服务监控',
+    },
 ];
 
 export const routes: RouteObject[] = [
@@ -100,6 +106,10 @@ export const routes: RouteObject[] = [
             {
                 path: 'setting',
                 element: <Wrapper component={<Setting/>}/>
+            },
+            {
+                path: 'metrics',
+                element: <Wrapper component={<Metrics/>}/>
             },
         ]
     },

@@ -39,7 +39,7 @@ const SettingPage = () => {
     };
 
     return (
-        <div className="p-6 bg-(--semi-color-bg-1) min-h-screen">
+        <div className="p-6 h-full">
             <div className="w-[90%] mx-auto">
                 <Title heading={3} className="mb-6">
                     <IconSetting className="mr-2"/>
