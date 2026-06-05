@@ -288,7 +288,7 @@ const MetricsPage: React.FC = () => {
                         </Card>
                     )}
                     {hasMemData && (
-                        <Card className="shadow-sm" style={{padding: 0}}>
+                        <Card className="shadow-sm" bodyStyle={{padding: 0}}>
                             <ReactECharts option={memChartOption} style={{height: 260, padding: 8}} notMerge
                                           lazyUpdate/>
                         </Card>
