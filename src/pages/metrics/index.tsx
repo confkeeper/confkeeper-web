@@ -43,13 +43,9 @@ function parsePrometheusText(text: string): Array<{ name: string; labels: Record
 
             const labels: Record<string, string> = {__name__: name};
             if (labelsStr) {
-                for (const pair of labelsStr.split(',')) {
-                    const eqIndex = pair.indexOf('=');
-                    if (eqIndex > 0) {
-                        const key = pair.substring(0, eqIndex).trim();
-                        const val = pair.substring(eqIndex + 1).trim().replace(/^"|"$/g, '');
-                        labels[key] = val;
-                    }
+                const matches = labelsStr.matchAll(/([\w_]+)\s*=\s*"([^"\\]*(?:\\.[^"\\]*)*)"/g);
+                for (const m of matches) {
+                    labels[m[1]] = m[2];
                 }
             }
 
@@ -94,59 +90,64 @@ const MetricsPage: React.FC = () => {
     const rateHistoryRef = useRef<Map<string, MetricHistory>>(new Map());
 
     const fetchMetrics = useCallback(async () => {
-        const text = await MetricsService.get_metrics();
-        if (!text) return;
+        try {
+            const text = await MetricsService.get_metrics();
+            if (!text) return;
 
-        const samples = parsePrometheusText(text);
-        const now = Date.now();
+            const samples = parsePrometheusText(text);
+            const now = Date.now();
 
-        const newRaw = new Map(rawHistoryRef.current);
-        const newRate = new Map(rateHistoryRef.current);
+            const newRaw = new Map(rawHistoryRef.current);
+            const newRate = new Map(rateHistoryRef.current);
 
-        for (const sample of samples) {
-            const isCpu = CPU_METRICS.includes(sample.name);
-            const isMem = MEM_METRICS.includes(sample.name);
-            if (!isCpu && !isMem) continue;
+            for (const sample of samples) {
+                const isCpu = CPU_METRICS.includes(sample.name);
+                const isMem = MEM_METRICS.includes(sample.name);
+                if (!isCpu && !isMem) continue;
 
-            const key = getMetricKey(sample.name, sample.labels);
+                const key = getMetricKey(sample.name, sample.labels);
 
-            if (newRaw.has(key)) {
-                const prev = newRaw.get(key)!;
-                const lastTs = prev.timestamps[prev.timestamps.length - 1];
-                const lastVal = prev.values[prev.values.length - 1];
-                const newTimestamps = [...prev.timestamps, now];
-                const newValues = [...prev.values, sample.value];
-                if (newTimestamps.length > MAX_HISTORY_POINTS) {
-                    newTimestamps.shift();
-                    newValues.shift();
-                }
-                newRaw.set(key, {timestamps: newTimestamps, values: newValues});
-
-                if (isCpu && now > lastTs) {
-                    const rate = (sample.value - lastVal) / ((now - lastTs) / 1000);
-                    const prevRate = newRate.get(key);
-                    if (prevRate) {
-                        const rTs = [...prevRate.timestamps, now];
-                        const rVals = [...prevRate.values, Math.max(0, rate)];
-                        if (rTs.length > MAX_HISTORY_POINTS) {
-                            rTs.shift();
-                            rVals.shift();
-                        }
-                        newRate.set(key, {timestamps: rTs, values: rVals});
-                    } else {
-                        newRate.set(key, {timestamps: [now], values: [Math.max(0, rate)]});
+                if (newRaw.has(key)) {
+                    const prev = newRaw.get(key)!;
+                    const lastTs = prev.timestamps[prev.timestamps.length - 1];
+                    const lastVal = prev.values[prev.values.length - 1];
+                    const newTimestamps = [...prev.timestamps, now];
+                    const newValues = [...prev.values, sample.value];
+                    if (newTimestamps.length > MAX_HISTORY_POINTS) {
+                        newTimestamps.shift();
+                        newValues.shift();
                     }
-                }
-            } else {
-                newRaw.set(key, {timestamps: [now], values: [sample.value]});
-            }
-        }
+                    newRaw.set(key, {timestamps: newTimestamps, values: newValues});
 
-        rawHistoryRef.current = newRaw;
-        rateHistoryRef.current = newRate;
-        setRawHistory(new Map(newRaw));
-        setRateHistory(new Map(newRate));
-        setLoading(false);
+                    if (isCpu && now > lastTs) {
+                        const rate = (sample.value - lastVal) / ((now - lastTs) / 1000);
+                        const prevRate = newRate.get(key);
+                        if (prevRate) {
+                            const rTs = [...prevRate.timestamps, now];
+                            const rVals = [...prevRate.values, Math.max(0, rate)];
+                            if (rTs.length > MAX_HISTORY_POINTS) {
+                                rTs.shift();
+                                rVals.shift();
+                            }
+                            newRate.set(key, {timestamps: rTs, values: rVals});
+                        } else {
+                            newRate.set(key, {timestamps: [now], values: [Math.max(0, rate)]});
+                        }
+                    }
+                } else {
+                    newRaw.set(key, {timestamps: [now], values: [sample.value]});
+                }
+            }
+
+            rawHistoryRef.current = newRaw;
+            rateHistoryRef.current = newRate;
+            setRawHistory(new Map(newRaw));
+            setRateHistory(new Map(newRate));
+        } catch (err) {
+            console.error("Failed to fetch metrics:", err);
+        } finally {
+            setLoading(false);
+        }
     }, []);
 
     useEffect(() => {
