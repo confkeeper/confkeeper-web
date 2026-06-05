@@ -35,7 +35,7 @@ function parsePrometheusText(text: string): Array<{ name: string; labels: Record
         const trimmed = line.trim();
         if (!trimmed || trimmed.startsWith('#')) continue;
 
-        const match = trimmed.match(/^(\w+)(?:\{([^}]*)\})?\s+([\d.eE+-]+|NaN|\+Inf|-Inf)$/);
+        const match = trimmed.match(/^([\w:]+)(?:\{([^}]*)\})?\s+([\d.eE+-]+|NaN|\+Inf|-Inf)$/);
         if (match) {
             const name = match[1];
             const labelsStr = match[2];
