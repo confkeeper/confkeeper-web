@@ -148,7 +148,7 @@ export default function Layout() {
                                 items={MenuRoutes}
                                 onSelect={(data) => onSelect(data)}
                                 defaultOpenKeys={defaultOpenKeys}
-                                renderWrapper={({ itemElement, props }) => {
+                                renderWrapper={({itemElement, props}) => {
                                     return React.cloneElement(itemElement, {
                                         onMouseDown: (e) => {
                                             if (e.button === 1) {
@@ -164,7 +164,13 @@ export default function Layout() {
                                     collapseButton: true,
                                 }}/>
                         </Sider>
-                        <Content className="overflow-auto" style={{flex: 1, minWidth: 0}}>
+                        <Content style={{
+                            flex: 1,
+                            minWidth: 0,
+                            overflowY: 'auto',
+                            overflowX: 'hidden',
+                            backgroundColor: 'var(--semi-color-bg-1)'
+                        }}>
                             <AnimatePresence mode="wait">
                                 <motion.div
                                     key={location.pathname}

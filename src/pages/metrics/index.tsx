@@ -256,7 +256,7 @@ const MetricsPage: React.FC = () => {
 
     if (loading) {
         return (
-            <div className="flex justify-center items-center min-h-screen">
+            <div className="flex justify-center items-center h-full">
                 <Spin size="large" tip="加载监控数据..."/>
             </div>
         );
@@ -267,7 +267,7 @@ const MetricsPage: React.FC = () => {
 
     if (!hasCpuData && !hasMemData) {
         return (
-            <div className="p-6 bg-(--semi-color-bg-1) min-h-screen">
+            <div className="p-6 h-full">
                 <div className="w-[95%] mx-auto">
                     <Title heading={3} className="mb-4">服务监控</Title>
                     <Empty description="暂无监控数据"/>
@@ -277,7 +277,7 @@ const MetricsPage: React.FC = () => {
     }
 
     return (
-        <div className="p-6 bg-(--semi-color-bg-1) min-h-screen">
+        <div className="p-6 h-full">
             <div className="w-[95%] mx-auto">
                 <Title heading={3} className="mb-6">
                     <IconHistogram className="mr-2"/>
