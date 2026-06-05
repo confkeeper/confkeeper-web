@@ -88,8 +88,11 @@ const MetricsPage: React.FC = () => {
     const timerRef = useRef<ReturnType<typeof setInterval> | null>(null);
     const rawHistoryRef = useRef<Map<string, MetricHistory>>(new Map());
     const rateHistoryRef = useRef<Map<string, MetricHistory>>(new Map());
+    const isFetchingRef = useRef(false);
 
     const fetchMetrics = useCallback(async () => {
+        if (isFetchingRef.current) return;
+        isFetchingRef.current = true;
         try {
             const text = await MetricsService.get_metrics();
             if (!text) return;
@@ -146,6 +149,7 @@ const MetricsPage: React.FC = () => {
         } catch (err) {
             console.error("Failed to fetch metrics:", err);
         } finally {
+            isFetchingRef.current = false;
             setLoading(false);
         }
     }, []);
@@ -178,7 +182,7 @@ const MetricsPage: React.FC = () => {
                     return `${formatTime(params[0].value[0])}<br/>CPU: <b>${params[0].value[1].toFixed(2)}%</b>`;
                 },
             },
-            grid: {left: 50, right: 10, top: 35, bottom: 20},
+            grid: {left: 50, right: 10, top: 35, bottom: 30},
             xAxis: {
                 type: 'time' as const,
                 min: Date.now() - DISPLAY_WINDOW,
@@ -227,7 +231,7 @@ const MetricsPage: React.FC = () => {
                 },
             },
             legend: {bottom: 0, textStyle: {fontSize: 11}, itemWidth: 14, itemHeight: 8},
-            grid: {left: 60, right: 10, top: 35, bottom: 35},
+            grid: {left: 60, right: 10, top: 35, bottom: 50},
             xAxis: {
                 type: 'time' as const,
                 min: Date.now() - DISPLAY_WINDOW,
@@ -258,8 +262,8 @@ const MetricsPage: React.FC = () => {
         );
     }
 
-    const hasCpuData = cpuChartOption.series.length > 0;
-    const hasMemData = memChartOption.series.length > 0;
+    const hasCpuData = cpuChartOption.series.length > 0 && cpuChartOption.series.some(s => s.data.length >= 2);
+    const hasMemData = memChartOption.series.length > 0 && memChartOption.series.some(s => s.data.length >= 2);
 
     if (!hasCpuData && !hasMemData) {
         return (
@@ -282,15 +286,13 @@ const MetricsPage: React.FC = () => {
 
                 <div className="grid grid-cols-1 lg:grid-cols-2 gap-4 mt-6">
                     {hasCpuData && (
-                        <Card className="shadow-sm" bodyStyle={{padding: 0}}>
-                            <ReactECharts option={cpuChartOption} style={{height: 260, padding: 8}} notMerge
-                                          lazyUpdate/>
+                        <Card className="shadow-sm">
+                            <ReactECharts option={cpuChartOption} style={{height: 280}} notMerge lazyUpdate/>
                         </Card>
                     )}
                     {hasMemData && (
-                        <Card className="shadow-sm" bodyStyle={{padding: 0}}>
-                            <ReactECharts option={memChartOption} style={{height: 260, padding: 8}} notMerge
-                                          lazyUpdate/>
+                        <Card className="shadow-sm">
+                            <ReactECharts option={memChartOption} style={{height: 280}} notMerge lazyUpdate/>
                         </Card>
                     )}
                 </div>
