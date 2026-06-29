@@ -1,4 +1,4 @@
-import React, { useRef, useState } from "react";
+import React, { useRef, useState, useCallback } from "react";
 import { Table, Button, Modal, Form, Input, Select, Toast } from '@douyinfe/semi-ui';
 import type { FormApi } from '@douyinfe/semi-ui/lib/es/form/interface';
 import useService from "@/src/hooks/useService";
@@ -94,6 +94,25 @@ const ConfigInfoPage = () => {
     }>({});
     const cloneFormApi = useRef<FormApi>(null);
     const [globalSearchVisible, setGlobalSearchVisible] = useState(false);
+
+    const searchConfig = useCallback(() => {
+        const newParams = new URLSearchParams(searchParams.toString());
+        newParams.set('pageNum', '1');
+        if (tenantId) newParams.set('tenant_id', tenantId);
+        if (dataIdInput) newParams.set('data_id', dataIdInput);
+        else newParams.delete('data_id');
+        if (groupIdInput) newParams.set('group_id', groupIdInput);
+        else newParams.delete('group_id');
+        if (typeInput) newParams.set('type', typeInput);
+        else newParams.delete('type');
+        setSearchParams(newParams);
+        setQueryParams({
+            data_id: dataIdInput || undefined,
+            group_id: groupIdInput || undefined,
+            type: typeInput || undefined,
+        });
+        setPage(1);
+    }, [searchParams, tenantId, dataIdInput, groupIdInput, typeInput]);
 
     const handleDelete = async (id: string) => {
         Modal.confirm({
@@ -283,63 +302,35 @@ const ConfigInfoPage = () => {
                 {/* 查询区域 */}
                 <div className="flex justify-between items-center p-4 rounded-lg shadow-sm">
                     <div className="flex gap-2 h-full items-center">
-                        {/* 搜索配置函数 */}
-                        {(() => {
-                            // 将searchConfig函数定义在组件级别
-                            const searchConfig = () => {
-                                const newParams = new URLSearchParams(searchParams.toString());
-                                newParams.set('pageNum', '1');
-                                if (tenantId) newParams.set('tenant_id', tenantId);
-                                if (dataIdInput) newParams.set('data_id', dataIdInput);
-                                else newParams.delete('data_id');
-                                if (groupIdInput) newParams.set('group_id', groupIdInput);
-                                else newParams.delete('group_id');
-                                if (typeInput) newParams.set('type', typeInput);
-                                else newParams.delete('type');
-                                setSearchParams(newParams);
-                                setQueryParams({
-                                    data_id: dataIdInput || undefined,
-                                    group_id: groupIdInput || undefined,
-                                    type: typeInput || undefined,
-                                });
-                                setPage(1);
-                            };
-
-                            // 暴露searchConfig函数到外部作用域
-                            (window as any)._searchConfig = searchConfig;
-
-                            return (
-                                <>
-                                    <Input value={dataIdInput}
-                                           onChange={(value: string | undefined) => setDataIdInput(value || '')}
-                                           placeholder='Data Id'
-                                           onKeyDown={(e) => {
-                                               if (e.key === 'Enter') {
-                                                   searchConfig();
-                                               }
-                                           }}
-                                           showClear
-                                    />
-                                    <Input value={groupIdInput}
-                                           onChange={(value: string | undefined) => setGroupIdInput(value || '')}
-                                           placeholder='Group'
-                                           onKeyDown={(e) => {
-                                               if (e.key === 'Enter') {
-                                                   searchConfig();
-                                               }
-                                           }}
-                                           showClear
-                                    />
-                                </>
-                            );
-                        })()}
+                        <Input value={dataIdInput}
+                               onChange={(value: string | undefined) => setDataIdInput(value || '')}
+                               placeholder='Data Id'
+                               onKeyDown={(e) => {
+                                   if (e.key === 'Enter') {
+                                       searchConfig();
+                                   }
+                               }}
+                               showClear
+                               style={{width: 200}}
+                        />
+                        <Input value={groupIdInput}
+                               onChange={(value: string | undefined) => setGroupIdInput(value || '')}
+                               placeholder='Group'
+                               onKeyDown={(e) => {
+                                   if (e.key === 'Enter') {
+                                       searchConfig();
+                                   }
+                               }}
+                               showClear
+                               style={{width: 400}}
+                        />
 
                         <Select
                             value={typeInput}
                             onChange={(value) => {
                                 setTypeInput(typeof value === 'string' ? value : '');
                             }}
-                            style={{width: 400}}
+                            style={{width: 100}}
                             placeholder="类型"
                             showClear
                             filter
@@ -355,7 +346,7 @@ const ConfigInfoPage = () => {
                         <Button
                             type="primary"
                             theme="solid"
-                            onClick={() => (window as any)._searchConfig?.()}
+                            onClick={searchConfig}
                         >查询</Button>
                         <Button
                             icon={<IconRefresh/>}
