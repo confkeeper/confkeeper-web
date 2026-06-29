@@ -3,9 +3,16 @@ import { useNavigate, useSearchParams } from "react-router-dom";
 import { ConfigInfoService } from "@/src/services/config_info";
 import MonacoEditor from "react-monaco-editor/lib/editor";
 import { Button, Form, HotKeys, Radio, Space, Typography, Modal, Switch } from '@douyinfe/semi-ui';
-import { IconArrowLeft, IconFullScreenStroked, IconShrinkScreenStroked } from "@douyinfe/semi-icons";
+import {
+    IconArrowLeft,
+    IconFullScreenStroked,
+    IconShrinkScreenStroked,
+    IconMinus,
+    IconPlus
+} from "@douyinfe/semi-icons";
 import { FormApi } from "@douyinfe/semi-ui/lib/es/form";
 import { languageListStore } from "@/src/stores/useLanguageListStore";
+import { editorSettingsStore } from "@/src/stores/useEditorSettingsStore";
 import DiffModal from "@/src/components/DiffModal";
 import CompareConfigModal from "@/src/components/CompareConfigModal";
 import VersionCompareModal from "@/src/components/VersionCompareModal";
@@ -36,6 +43,11 @@ const EditConfigContextPage = () => {
     const [isFullscreen, setIsFullscreen] = useState(false);
     const [wordWrap, setWordWrap] = useState<'on' | 'off'>('off');
     const [lineEnding, setLineEnding] = useState<LineEndingType>('unix');
+    const [fontSize, setFontSize] = useState(() => editorSettingsStore.getState().fontSize);
+    const changeFontSize = (newSize: number) => {
+        setFontSize(newSize);
+        editorSettingsStore.getState().setFontSize(newSize);
+    };
 
     const handleToggleLineEnding = () => {
         const result = toggleLineEndingUtil(editorContent, lineEnding);
@@ -363,6 +375,31 @@ const EditConfigContextPage = () => {
                                 <label style={{
                                     display: 'flex',
                                     alignItems: 'center',
+                                    gap: '4px',
+                                    color: '#fff',
+                                    fontSize: '13px',
+                                    cursor: 'pointer',
+                                }}>
+                                    <span>字号</span>
+                                    <Button
+                                        size="small"
+                                        theme="borderless"
+                                        icon={<IconMinus/>}
+                                        onClick={() => changeFontSize(Math.max(8, fontSize - 1))}
+                                        style={{color: '#fff', padding: '0 4px'}}
+                                    />
+                                    <span style={{minWidth: '24px', textAlign: 'center'}}>{fontSize}</span>
+                                    <Button
+                                        size="small"
+                                        theme="borderless"
+                                        icon={<IconPlus/>}
+                                        onClick={() => changeFontSize(Math.min(30, fontSize + 1))}
+                                        style={{color: '#fff', padding: '0 4px'}}
+                                    />
+                                </label>
+                                <label style={{
+                                    display: 'flex',
+                                    alignItems: 'center',
                                     gap: '8px',
                                     color: '#fff',
                                     fontSize: '13px',
@@ -411,6 +448,7 @@ const EditConfigContextPage = () => {
                                     minimap: {enabled: false},
                                     readOnly: loading,
                                     wordWrap: wordWrap,
+                                    fontSize: fontSize,
                                 }}
                             />
                         </div>
