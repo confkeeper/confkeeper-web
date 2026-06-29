@@ -112,7 +112,7 @@ const ConfigInfoPage = () => {
             type: typeInput || undefined,
         });
         setPage(1);
-    }, [searchParams, tenantId, dataIdInput, groupIdInput, typeInput]);
+    }, [searchParams, tenantId, dataIdInput, groupIdInput, typeInput, setSearchParams, setQueryParams, setPage]);
 
     const handleDelete = async (id: string) => {
         Modal.confirm({
