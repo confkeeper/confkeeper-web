@@ -385,7 +385,7 @@ const EditConfigContextPage = () => {
                                         size="small"
                                         theme="borderless"
                                         icon={<IconMinus/>}
-                                        onClick={() => changeFontSize(Math.max(8, fontSize - 1))}
+                                        onClick={() => setFontSize(Math.max(8, fontSize - 1))}
                                         style={{color: '#fff', padding: '0 4px'}}
                                     />
                                     <span style={{minWidth: '24px', textAlign: 'center'}}>{fontSize}</span>
@@ -393,7 +393,7 @@ const EditConfigContextPage = () => {
                                         size="small"
                                         theme="borderless"
                                         icon={<IconPlus/>}
-                                        onClick={() => changeFontSize(Math.min(30, fontSize + 1))}
+                                        onClick={() => setFontSize(Math.min(30, fontSize + 1))}
                                         style={{color: '#fff', padding: '0 4px'}}
                                     />
                                 </label>
