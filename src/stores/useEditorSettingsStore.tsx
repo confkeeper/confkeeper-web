@@ -6,7 +6,7 @@ interface EditorSettingsState {
     setFontSize: (fontSize: number) => void;
 }
 
-export const editorSettingsStore = create<EditorSettingsState>()(
+export const useEditorSettingsStore = create<EditorSettingsState>()(
     persist(
         (set) => ({
             fontSize: 14,
