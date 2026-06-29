@@ -312,11 +312,7 @@ const ConfigInfoPage = () => {
                         <Input value={groupIdInput}
                                onChange={(value: string | undefined) => setGroupIdInput(value || '')}
                                placeholder='Group'
-                               onKeyDown={(e) => {
-                                   if (e.key === 'Enter') {
-                                       searchConfig();
-                                   }
-                               }}
+                               onEnterPress={searchConfig}
                                showClear
                                style={{width: 400}}
                         />
