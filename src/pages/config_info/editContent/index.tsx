@@ -12,7 +12,7 @@ import {
 } from "@douyinfe/semi-icons";
 import { FormApi } from "@douyinfe/semi-ui/lib/es/form";
 import { languageListStore } from "@/src/stores/useLanguageListStore";
-import { editorSettingsStore } from "@/src/stores/useEditorSettingsStore";
+import { useEditorSettingsStore } from "@/src/stores/useEditorSettingsStore";
 import DiffModal from "@/src/components/DiffModal";
 import CompareConfigModal from "@/src/components/CompareConfigModal";
 import VersionCompareModal from "@/src/components/VersionCompareModal";
