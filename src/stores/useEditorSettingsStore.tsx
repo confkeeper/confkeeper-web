@@ -9,7 +9,7 @@ interface EditorSettingsState {
 export const useEditorSettingsStore = create<EditorSettingsState>()(
     persist(
         (set) => ({
-            fontSize: 14,
+            fontSize: 12,
             setFontSize: (fontSize) => set({fontSize}),
         }),
         {

@@ -43,11 +43,8 @@ const EditConfigContextPage = () => {
     const [isFullscreen, setIsFullscreen] = useState(false);
     const [wordWrap, setWordWrap] = useState<'on' | 'off'>('off');
     const [lineEnding, setLineEnding] = useState<LineEndingType>('unix');
-    const [fontSize, setFontSize] = useState(() => editorSettingsStore.getState().fontSize);
-    const changeFontSize = (newSize: number) => {
-        setFontSize(newSize);
-        editorSettingsStore.getState().setFontSize(newSize);
-    };
+    const fontSize = useEditorSettingsStore((state) => state.fontSize);
+    const setFontSize = useEditorSettingsStore((state) => state.setFontSize);
 
     const handleToggleLineEnding = () => {
         const result = toggleLineEndingUtil(editorContent, lineEnding);
