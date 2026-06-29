@@ -305,11 +305,7 @@ const ConfigInfoPage = () => {
                         <Input value={dataIdInput}
                                onChange={(value: string | undefined) => setDataIdInput(value || '')}
                                placeholder='Data Id'
-                               onKeyDown={(e) => {
-                                   if (e.key === 'Enter') {
-                                       searchConfig();
-                                   }
-                               }}
+                               onEnterPress={searchConfig}
                                showClear
                                style={{width: 200}}
                         />
