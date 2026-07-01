@@ -464,6 +464,7 @@ const EditConfigContextPage = () => {
                                 editorDidMount={(editor: any, monaco: any) => {
                                     editorRef.current = editor;
                                     monacoRef.current = monaco;
+                                    diffDecorationsRef.current = [];
                                     setEditorMounted(true);
                                     injectDiffGutterStyles();
                                 }}
