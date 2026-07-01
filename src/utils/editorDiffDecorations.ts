@@ -155,10 +155,12 @@ function classifyAddedLines(removed: string[], added: string[]): boolean[] {
  * 「修改」(modified, 橙) 还是「新增」(added, 绿)，并将相邻同类型行合并为一个区间。
  */
 export function computeDiffDecorations(baseline: string, current: string): DiffDecoration[] {
-    if (baseline === current) return [];
+    const normalizedBaseline = (baseline || '').replace(/\r\n/g, '\n');
+    const normalizedCurrent = (current || '').replace(/\r\n/g, '\n');
+    if (normalizedBaseline === normalizedCurrent) return [];
 
-    const oldLines = baseline.length ? baseline.split('\n') : [];
-    const newLines = current.length ? current.split('\n') : [];
+    const oldLines = normalizedBaseline.length ? normalizedBaseline.split('\n') : [];
+    const newLines = normalizedCurrent.length ? normalizedCurrent.split('\n') : [];
 
     if (oldLines.length > MAX_LINES || newLines.length > MAX_LINES) return [];
 
