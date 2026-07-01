@@ -19,6 +19,11 @@ import VersionCompareModal from "@/src/components/VersionCompareModal";
 import ConvertModal from "@/src/components/ConvertModal";
 import { getUsername } from "@/src/utils/auth";
 import { detectLineEnding, toggleLineEnding as toggleLineEndingUtil, LineEndingType } from "@/src/utils/lineEnding";
+import {
+    computeDiffDecorations,
+    buildMonacoDiffDecorations,
+    injectDiffGutterStyles
+} from "@/src/utils/editorDiffDecorations";
 
 const EditConfigContextPage = () => {
     const navigate = useNavigate();
@@ -40,6 +45,9 @@ const EditConfigContextPage = () => {
     const [loading, setLoading] = useState(!isNewConfig);
     const formApi = useRef<FormApi>(null);
     const editorRef = useRef<any>(null);
+    const monacoRef = useRef<any>(null);
+    const diffDecorationsRef = useRef<string[]>([]);
+    const [editorMounted, setEditorMounted] = useState(false);
     const [isFullscreen, setIsFullscreen] = useState(false);
     const [wordWrap, setWordWrap] = useState<'on' | 'off'>('off');
     const [lineEnding, setLineEnding] = useState<LineEndingType>('unix');
@@ -181,6 +189,22 @@ const EditConfigContextPage = () => {
     useEffect(() => {
         setLineEnding(detectLineEnding(editorContent));
     }, [editorContent]);
+
+    // 根据已保存内容(configContent.content)与当前编辑内容(editorContent)的差异，
+    // 在编辑器左侧装订线显示 Git 风格的修改(橙)/新增(绿)标记
+    useEffect(() => {
+        const editor = editorRef.current;
+        const monaco = monacoRef.current;
+        if (!editor || !monaco || !editorMounted) return;
+
+        const timer = setTimeout(() => {
+            const decorations = computeDiffDecorations(configContent.content || '', editorContent || '');
+            const monacoDecorations = buildMonacoDiffDecorations(monaco, decorations);
+            diffDecorationsRef.current = editor.deltaDecorations(diffDecorationsRef.current, monacoDecorations);
+        }, 300);
+
+        return () => clearTimeout(timer);
+    }, [editorContent, configContent.content, editorMounted]);
 
     useEffect(() => {
         const handleFindShortcut = (e: KeyboardEvent) => {
@@ -437,8 +461,12 @@ const EditConfigContextPage = () => {
                                 onChange={setEditorContent}
                                 language={getConfigType()}
                                 theme="vs-dark"
-                                editorDidMount={(editor: any) => {
+                                editorDidMount={(editor: any, monaco: any) => {
                                     editorRef.current = editor;
+                                    monacoRef.current = monaco;
+                                    diffDecorationsRef.current = [];
+                                    setEditorMounted(true);
+                                    injectDiffGutterStyles();
                                 }}
                                 options={{
                                     automaticLayout: true,
@@ -446,6 +474,7 @@ const EditConfigContextPage = () => {
                                     readOnly: loading,
                                     wordWrap: wordWrap,
                                     fontSize: fontSize,
+                                    glyphMargin: true,
                                 }}
                             />
                         </div>
