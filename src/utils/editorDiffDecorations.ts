@@ -103,6 +103,8 @@ function levenshtein(a: string, b: string): number {
 function lineSimilarity(a: string, b: string): number {
     if (a === b) return 1;
     if (a.length === 0 || b.length === 0) return 0;
+    // 限制单行长度，防止超长行导致 Levenshtein 算法卡死浏览器
+    if (a.length > 1000 || b.length > 1000) return 0;
     return 1 - levenshtein(a, b) / Math.max(a.length, b.length);
 }
 
