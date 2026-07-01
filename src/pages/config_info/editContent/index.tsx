@@ -47,6 +47,7 @@ const EditConfigContextPage = () => {
     const editorRef = useRef<any>(null);
     const monacoRef = useRef<any>(null);
     const diffDecorationsRef = useRef<string[]>([]);
+    const [editorMounted, setEditorMounted] = useState(false);
     const [isFullscreen, setIsFullscreen] = useState(false);
     const [wordWrap, setWordWrap] = useState<'on' | 'off'>('off');
     const [lineEnding, setLineEnding] = useState<LineEndingType>('unix');
@@ -194,11 +195,16 @@ const EditConfigContextPage = () => {
     useEffect(() => {
         const editor = editorRef.current;
         const monaco = monacoRef.current;
-        if (!editor || !monaco) return;
-        const decorations = computeDiffDecorations(configContent.content || '', editorContent || '');
-        const monacoDecorations = buildMonacoDiffDecorations(monaco, decorations);
-        diffDecorationsRef.current = editor.deltaDecorations(diffDecorationsRef.current, monacoDecorations);
-    }, [editorContent, configContent.content]);
+        if (!editor || !monaco || !editorMounted) return;
+
+        const timer = setTimeout(() => {
+            const decorations = computeDiffDecorations(configContent.content || '', editorContent || '');
+            const monacoDecorations = buildMonacoDiffDecorations(monaco, decorations);
+            diffDecorationsRef.current = editor.deltaDecorations(diffDecorationsRef.current, monacoDecorations);
+        }, 300);
+
+        return () => clearTimeout(timer);
+    }, [editorContent, configContent.content, editorMounted]);
 
     useEffect(() => {
         const handleFindShortcut = (e: KeyboardEvent) => {
@@ -458,6 +464,7 @@ const EditConfigContextPage = () => {
                                 editorDidMount={(editor: any, monaco: any) => {
                                     editorRef.current = editor;
                                     monacoRef.current = monaco;
+                                    setEditorMounted(true);
                                     injectDiffGutterStyles();
                                 }}
                                 options={{

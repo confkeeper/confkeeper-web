@@ -30,7 +30,7 @@ function diffLines(oldLines: string[], newLines: string[]): DiffEntry[] {
     const n = oldLines.length;
     const m = newLines.length;
     const width = m + 1;
-    const dp = new Uint32Array((n + 1) * width);
+    const dp = new Uint16Array((n + 1) * width);
     const idx = (i: number, j: number) => i * width + j;
 
     for (let i = n - 1; i >= 0; i--) {
@@ -98,14 +98,26 @@ export function computeDiffDecorations(baseline: string, current: string): DiffD
         const hunk = diff.slice(hunkStart, k);
         const hasRemoved = hunk.some(d => d.type === 'removed');
         const type: DiffLineType = hasRemoved ? 'modified' : 'added';
+        let currentDecoration: DiffDecoration | null = null;
         for (const d of hunk) {
             if (d.type === 'added' && d.newLine !== undefined) {
-                decorations.push({
-                    startLineNumber: d.newLine + 1,
-                    endLineNumber: d.newLine + 1,
-                    type,
-                });
+                const line = d.newLine + 1;
+                if (currentDecoration && currentDecoration.endLineNumber === line - 1) {
+                    currentDecoration.endLineNumber = line;
+                } else {
+                    if (currentDecoration) {
+                        decorations.push(currentDecoration);
+                    }
+                    currentDecoration = {
+                        startLineNumber: line,
+                        endLineNumber: line,
+                        type,
+                    };
+                }
             }
+        }
+        if (currentDecoration) {
+            decorations.push(currentDecoration);
         }
     }
     return decorations;
