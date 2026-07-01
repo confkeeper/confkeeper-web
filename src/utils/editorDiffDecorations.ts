@@ -31,14 +31,18 @@ function diffLines(oldLines: string[], newLines: string[]): DiffEntry[] {
     const m = newLines.length;
     const width = m + 1;
     const dp = new Uint16Array((n + 1) * width);
-    const idx = (i: number, j: number) => i * width + j;
 
     for (let i = n - 1; i >= 0; i--) {
+        const rowOffset = i * width;
+        const nextRowOffset = (i + 1) * width;
+        const oldLine = oldLines[i];
         for (let j = m - 1; j >= 0; j--) {
-            if (oldLines[i] === newLines[j]) {
-                dp[idx(i, j)] = dp[idx(i + 1, j + 1)] + 1;
+            if (oldLine === newLines[j]) {
+                dp[rowOffset + j] = dp[nextRowOffset + j + 1] + 1;
             } else {
-                dp[idx(i, j)] = Math.max(dp[idx(i + 1, j)], dp[idx(i, j + 1)]);
+                const val1 = dp[nextRowOffset + j];
+                const val2 = dp[rowOffset + j + 1];
+                dp[rowOffset + j] = val1 > val2 ? val1 : val2;
             }
         }
     }
@@ -50,7 +54,7 @@ function diffLines(oldLines: string[], newLines: string[]): DiffEntry[] {
             result.push({type: 'equal', oldLine: i, newLine: j});
             i++;
             j++;
-        } else if (dp[idx(i + 1, j)] >= dp[idx(i, j + 1)]) {
+        } else if (dp[(i + 1) * width + j] >= dp[i * width + j + 1]) {
             result.push({type: 'removed', oldLine: i});
             i++;
         } else {
@@ -102,6 +106,7 @@ function lineSimilarity(a: string, b: string): number {
     return 1 - levenshtein(a, b) / Math.max(a.length, b.length);
 }
 
+
 /**
  * 在一个 hunk 内判定每条新增行是「修改」(替换了某条删除行) 还是「纯新增」。
  * 采用贪心最大相似度配对，并保证至少配对 min(删除数, 新增数) 对：
@@ -112,6 +117,15 @@ function lineSimilarity(a: string, b: string): number {
 function classifyAddedLines(removed: string[], added: string[]): boolean[] {
     const result = new Array<boolean>(added.length).fill(false);
     if (removed.length === 0 || added.length === 0) return result;
+
+    // Prevent performance degradation on large hunks (O(R * A * L^2))
+    if (removed.length * added.length > 2000) {
+        const minPairs = Math.min(removed.length, added.length);
+        for (let i = 0; i < minPairs; i++) {
+            result[i] = true;
+        }
+        return result;
+    }
 
     const minPairs = Math.min(removed.length, added.length);
     const pairs: { r: number; a: number; sim: number }[] = [];
