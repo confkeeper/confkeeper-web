@@ -106,6 +106,23 @@ export interface GetVersionResp extends CommonResp {
     data: ConfigVersionItem[];
 }
 
+export interface BlameRun {
+    start_line: number;
+    end_line: number;
+    author: string;
+    create_time: string;
+    version: number;
+}
+
+export interface BlameData {
+    total_lines: number;
+    runs: BlameRun[];
+}
+
+export interface BlameResp extends CommonResp {
+    data: BlameData;
+}
+
 interface CloneConfigItem {
     config_id: string;
     data_id: string;

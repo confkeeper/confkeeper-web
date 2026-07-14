@@ -1,6 +1,7 @@
 import {
     AddConfigInfoParams,
     BatchDeleteConfigInfoParams,
+    BlameData,
     CloneConfigParams,
     DeleteConfigInfoParams,
     GetConfigByParamsReq,
@@ -168,6 +169,21 @@ export const ConfigInfoService = {
         } catch (err) {
             Toast.error('网络请求异常');
             return {data: []};
+        }
+    },
+
+    /** 获取配置行修改记录（blame） */
+    get_blame: async (config_id: string): Promise<BlameData> => {
+        try {
+            const resp = await ConfigInfoAPI.GetBlame(config_id);
+            if (resp.code === 200) {
+                return resp.data || {total_lines: 0, runs: []};
+            }
+            Toast.error(resp.msg || '获取行修改信息失败');
+            return {total_lines: 0, runs: []};
+        } catch (err) {
+            Toast.error('获取行修改信息异常');
+            return {total_lines: 0, runs: []};
         }
     },
 

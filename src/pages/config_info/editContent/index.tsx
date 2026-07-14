@@ -1,8 +1,9 @@
 import React, { useRef, useState, useEffect } from "react";
 import { useNavigate, useSearchParams } from "react-router-dom";
 import { ConfigInfoService } from "@/src/services/config_info";
+import type { BlameRun } from "@/src/api/config_info/types";
 import MonacoEditor from "react-monaco-editor/lib/editor";
-import { Button, Form, HotKeys, Radio, Space, Typography, Modal, Switch } from '@douyinfe/semi-ui';
+import { Button, Form, HotKeys, Radio, Space, Typography, Modal, Switch, Toast } from '@douyinfe/semi-ui';
 import {
     IconArrowLeft,
     IconFullScreenStroked,
@@ -47,10 +48,19 @@ const EditConfigContextPage = () => {
     const editorRef = useRef<any>(null);
     const monacoRef = useRef<any>(null);
     const diffDecorationsRef = useRef<string[]>([]);
+    const blameDecorationsRef = useRef<string[]>([]);
+    const blameWidgetRef = useRef<any>(null);
+    const blameWidgetVisibleRef = useRef(false);
+    const blameWidgetPositionRef = useRef<{ lineNumber: number; column: number } | null>(null);
+    const blameWidgetAddedRef = useRef(false);
     const [editorMounted, setEditorMounted] = useState(false);
     const [isFullscreen, setIsFullscreen] = useState(false);
     const [wordWrap, setWordWrap] = useState<'on' | 'off'>('off');
     const [lineEnding, setLineEnding] = useState<LineEndingType>('unix');
+    const [blameRuns, setBlameRuns] = useState<BlameRun[]>([]);
+    const blameRunsRef = useRef<BlameRun[]>([]);
+    const currentLineRef = useRef<number>(1);
+    const blameRequestSeqRef = useRef(0);
     const fontSize = useEditorSettingsStore((state) => state.fontSize);
     const setFontSize = useEditorSettingsStore((state) => state.setFontSize);
 
@@ -58,6 +68,156 @@ const EditConfigContextPage = () => {
         const result = toggleLineEndingUtil(editorContent, lineEnding);
         setEditorContent(result.content);
         setLineEnding(result.lineEnding);
+    };
+
+    // 获取配置每行最后修改人/时间（类似 GitLens blame）
+    const fetchBlame = (cid: string) => {
+        const requestSeq = ++blameRequestSeqRef.current;
+        if (!cid) {
+            setBlameRuns([]);
+            return;
+        }
+        ConfigInfoService.get_blame(cid).then((data) => {
+            if (requestSeq !== blameRequestSeqRef.current) return;
+            const runs = data?.runs || [];
+            if (data?.total_lines > 0 && runs.length === 0) {
+                Toast.warning('当前配置行数较多，暂未显示行修改信息');
+            }
+            setBlameRuns(runs);
+        });
+    };
+
+    // 将后端返回的 "2026-07-14 10:00:00" 格式化为行尾显示文本
+    const formatBlameText = (author: string, createTime: string) => {
+        const parts = (createTime || '').split(' ');
+        const datePart = parts[0] || '';
+        const timePart = (parts[1] || '').slice(0, 5);
+        return `   ${author || '未知'} · ${datePart} ${timePart}`;
+    };
+
+    // 注入行修改记录样式（仅注入一次）
+    const injectBlameStyles = () => {
+        const styleId = 'monaco-editor-blame-style';
+        if (document.getElementById(styleId)) return;
+        const style = document.createElement('style');
+        style.id = styleId;
+        style.textContent = `
+            .monaco-editor .blame-inline-text {
+                color: rgba(255, 255, 255, 0.55);
+                font-size: 12px;
+                font-style: italic;
+                margin-left: 16px;
+                white-space: pre;
+            }
+            .monaco-editor .blame-content-widget {
+                color: rgba(255, 255, 255, 0.62);
+                font-size: 12px;
+                font-style: italic;
+                line-height: 20px;
+                padding-left: 16px;
+                pointer-events: none;
+                user-select: none;
+                white-space: nowrap;
+                z-index: 50;
+            }
+        `;
+        document.head.appendChild(style);
+    };
+
+    const ensureBlameWidget = () => {
+        const editor = editorRef.current;
+        const monaco = monacoRef.current;
+        if (!editor || !monaco) return null;
+
+        if (!blameWidgetRef.current) {
+            const domNode = document.createElement('span');
+            domNode.className = 'blame-content-widget';
+
+            blameWidgetRef.current = {
+                allowEditorOverflow: true,
+                suppressMouseDown: true,
+                getId: () => 'confkeeper-current-line-blame',
+                getDomNode: () => domNode,
+                getPosition: () => {
+                    const position = blameWidgetPositionRef.current;
+                    if (!blameWidgetVisibleRef.current || !position) return null;
+                    return {
+                        position,
+                        preference: [monaco.editor.ContentWidgetPositionPreference.EXACT],
+                        positionAffinity: monaco.editor?.PositionAffinity?.Right,
+                    };
+                },
+            };
+        }
+
+        if (!blameWidgetAddedRef.current) {
+            editor.addContentWidget(blameWidgetRef.current);
+            blameWidgetAddedRef.current = true;
+        }
+
+        return blameWidgetRef.current;
+    };
+
+    const hideBlame = () => {
+        const editor = editorRef.current;
+        if (!editor) return;
+
+        blameDecorationsRef.current = editor.deltaDecorations(blameDecorationsRef.current, []);
+        blameWidgetVisibleRef.current = false;
+        blameWidgetPositionRef.current = null;
+        const widget = blameWidgetRef.current;
+        if (widget) {
+            widget.getDomNode().textContent = '';
+            editor.layoutContentWidget(widget);
+        }
+    };
+
+    // 只在光标所在行行尾显示该行最后修改人/时间（类似 GitLens 当前行 blame）
+    const refreshBlameDecoration = () => {
+        const editor = editorRef.current;
+        const monaco = monacoRef.current;
+        if (!editor || !monaco) return;
+        const runs = blameRunsRef.current;
+        if (!runs.length || isNewConfig) {
+            hideBlame();
+            return;
+        }
+        const line = currentLineRef.current;
+        const model = editor.getModel();
+        const lineCount = model?.getLineCount?.() || 0;
+        if (!model || line < 1 || line > lineCount) {
+            hideBlame();
+            return;
+        }
+        const run = runs.find(r => line >= r.start_line && line <= r.end_line);
+        if (!run) {
+            hideBlame();
+            return;
+        }
+        const lineEndColumn = model.getLineMaxColumn(line);
+        const blameText = formatBlameText(run.author, run.create_time);
+
+        const widget = ensureBlameWidget();
+        if (widget) {
+            blameDecorationsRef.current = editor.deltaDecorations(blameDecorationsRef.current, []);
+            blameWidgetVisibleRef.current = true;
+            blameWidgetPositionRef.current = {lineNumber: line, column: lineEndColumn};
+            widget.getDomNode().textContent = blameText.trimStart();
+            editor.layoutContentWidget(widget);
+            return;
+        }
+
+        blameDecorationsRef.current = editor.deltaDecorations(blameDecorationsRef.current, [{
+            range: new monaco.Range(line, lineEndColumn, line, lineEndColumn),
+            options: {
+                after: {
+                    content: blameText,
+                    inlineClassName: 'blame-inline-text',
+                    cursorStops: monaco.editor?.InjectedTextCursorStops?.None,
+                },
+                stickiness: monaco.editor?.TrackedRangeStickiness?.NeverGrowsWhenTypingAtEdges,
+            },
+        }]);
     };
 
     useEffect(() => {
@@ -72,10 +232,15 @@ const EditConfigContextPage = () => {
                 if (formApi.current) {
                     formApi.current.setValues(data);
                 }
+                // 获取行修改记录（blame）
+                const cid = 'config_id' in data ? (data as any).config_id : '';
+                fetchBlame(cid);
             }).finally(() => {
                 setLoading(false);
             });
         } else if (isNewConfig && tenant_id) {
+            setConfigId('');
+            setBlameRuns([]);
             setConfigContent({
                 config_id: "",
                 content: "",
@@ -93,7 +258,7 @@ const EditConfigContextPage = () => {
             }
             setLoading(false);
         }
-    }, [config_id, tenant_id, data_id, group_id, isNewConfig]);
+    }, [tenant_id, data_id, group_id, isNewConfig]);
 
     const [diffModalVisible, setDiffModalVisible] = useState(false);
     const [compareModalVisible, setCompareModalVisible] = useState(false);
@@ -206,6 +371,17 @@ const EditConfigContextPage = () => {
         return () => clearTimeout(timer);
     }, [editorContent, configContent.content, editorMounted]);
 
+    // blame 数据变化后同步到 ref，并刷新光标所在行的行尾标注
+    useEffect(() => {
+        blameRunsRef.current = blameRuns || [];
+        refreshBlameDecoration();
+    }, [blameRuns]);
+
+    // 当编辑内容与保存内容一致性发生变化时，刷新 blame 标注
+    useEffect(() => {
+        refreshBlameDecoration();
+    }, [editorContent === configContent.content, editorMounted]);
+
     useEffect(() => {
         const handleFindShortcut = (e: KeyboardEvent) => {
             if ((e.ctrlKey || e.metaKey) && e.key.toLowerCase() === 'f') {
@@ -250,6 +426,8 @@ const EditConfigContextPage = () => {
                         content: editorContent
                     }));
                     setDiffModalVisible(false);
+                    // 保存后重新获取行修改记录（新版本已生成）
+                    fetchBlame(config_id);
                     Modal.success({
                         title: "提示",
                         content: "保存成功",
@@ -465,8 +643,22 @@ const EditConfigContextPage = () => {
                                     editorRef.current = editor;
                                     monacoRef.current = monaco;
                                     diffDecorationsRef.current = [];
+                                    blameDecorationsRef.current = [];
+                                    blameWidgetRef.current = null;
+                                    blameWidgetAddedRef.current = false;
+                                    blameWidgetVisibleRef.current = false;
+                                    blameWidgetPositionRef.current = null;
+                                    currentLineRef.current = editor.getPosition()?.lineNumber || 1;
                                     setEditorMounted(true);
                                     injectDiffGutterStyles();
+                                    injectBlameStyles();
+                                    // 光标移动时更新当前行，并刷新行尾修改人标注
+                                    editor.onDidChangeCursorPosition((e: any) => {
+                                        currentLineRef.current = e.position.lineNumber;
+                                        refreshBlameDecoration();
+                                    });
+                                    // 挂载后若已有 blame 数据，立即刷新一次
+                                    refreshBlameDecoration();
                                 }}
                                 options={{
                                     automaticLayout: true,
