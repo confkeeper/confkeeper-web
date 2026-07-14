@@ -377,10 +377,10 @@ const EditConfigContextPage = () => {
         refreshBlameDecoration();
     }, [blameRuns]);
 
-    // 编辑内容变化时当前行行尾列号可能变化，需要把 blame 文本重新贴到行尾。
+    // 当编辑内容与保存内容一致性发生变化时，刷新 blame 标注
     useEffect(() => {
         refreshBlameDecoration();
-    }, [editorContent, editorMounted]);
+    }, [editorContent === configContent.content, editorMounted]);
 
     useEffect(() => {
         const handleFindShortcut = (e: KeyboardEvent) => {
