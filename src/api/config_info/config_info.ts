@@ -4,6 +4,7 @@ import {
   AddConfigInfoResp,
   BatchDeleteConfigInfoParams,
   BatchDeleteConfigInfoResp,
+  BlameResp,
   CleanupConfigResp,
   CloneConfigParams,
   CloneConfigResp,
@@ -66,6 +67,11 @@ export async function GetByParams(params: GetConfigByParamsReq) {
 /** 获取配置所有版本 */
 export async function GetVersion(params: GetVersionParams) {
   return request.Get<GetVersionResp>(`/api/config/get_version/${params.config_id}`);
+}
+
+/** 获取配置行修改记录（blame） */
+export async function GetBlame(configId: string) {
+  return request.Get<BlameResp>(`/api/config/blame/${configId}`);
 }
 
 /** 克隆配置 */
