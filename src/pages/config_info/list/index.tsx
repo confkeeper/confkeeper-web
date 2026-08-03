@@ -95,6 +95,47 @@ const ConfigInfoPage = () => {
     const cloneFormApi = useRef<FormApi>(null);
     const [globalSearchVisible, setGlobalSearchVisible] = useState(false);
 
+    const syncSearchParamsToUrl = useCallback((nextValues: {
+        data_id?: string;
+        group_id?: string;
+        type?: string;
+    }) => {
+        const nextDataId = nextValues.data_id ?? dataIdInput;
+        const nextGroupId = nextValues.group_id ?? groupIdInput;
+        const nextType = nextValues.type ?? typeInput;
+        const newParams = new URLSearchParams(searchParams.toString());
+
+        if (tenantId) newParams.set('tenant_id', tenantId);
+        newParams.set('pageNum', '1');
+        newParams.set('pageSize', pageSize.toString());
+        if (nextDataId) newParams.set('data_id', nextDataId);
+        else newParams.delete('data_id');
+        if (nextGroupId) newParams.set('group_id', nextGroupId);
+        else newParams.delete('group_id');
+        if (nextType) newParams.set('type', nextType);
+        else newParams.delete('type');
+
+        setSearchParams(newParams, {replace: true});
+    }, [searchParams, tenantId, pageSize, dataIdInput, groupIdInput, typeInput, setSearchParams]);
+
+    const handleDataIdInputChange = useCallback((value: string | undefined) => {
+        const nextDataId = value || '';
+        setDataIdInput(nextDataId);
+        syncSearchParamsToUrl({data_id: nextDataId});
+    }, [syncSearchParamsToUrl]);
+
+    const handleGroupIdInputChange = useCallback((value: string | undefined) => {
+        const nextGroupId = value || '';
+        setGroupIdInput(nextGroupId);
+        syncSearchParamsToUrl({group_id: nextGroupId});
+    }, [syncSearchParamsToUrl]);
+
+    const handleTypeInputChange = useCallback((value: unknown) => {
+        const nextType = typeof value === 'string' ? value : '';
+        setTypeInput(nextType);
+        syncSearchParamsToUrl({type: nextType});
+    }, [syncSearchParamsToUrl]);
+
     const searchConfig = useCallback(() => {
         const newParams = new URLSearchParams(searchParams.toString());
         newParams.set('pageNum', '1');
@@ -303,14 +344,14 @@ const ConfigInfoPage = () => {
                 <div className="flex justify-between items-center p-4 rounded-lg shadow-sm">
                     <div className="flex gap-2 h-full items-center">
                         <Input value={dataIdInput}
-                               onChange={(value: string | undefined) => setDataIdInput(value || '')}
+                               onChange={handleDataIdInputChange}
                                placeholder='Data Id'
                                onEnterPress={searchConfig}
                                showClear
                                style={{width: 200}}
                         />
                         <Input value={groupIdInput}
-                               onChange={(value: string | undefined) => setGroupIdInput(value || '')}
+                               onChange={handleGroupIdInputChange}
                                placeholder='Group'
                                onEnterPress={searchConfig}
                                showClear
@@ -319,9 +360,7 @@ const ConfigInfoPage = () => {
 
                         <Select
                             value={typeInput}
-                            onChange={(value) => {
-                                setTypeInput(typeof value === 'string' ? value : '');
-                            }}
+                            onChange={handleTypeInputChange}
                             style={{width: 100}}
                             placeholder="类型"
                             showClear
