@@ -15,6 +15,7 @@ export interface UpdateConfigInfoParams {
   group_id?: string;
   content?: string;
   type?: string;
+  oldversion: number | string;
 }
 
 export interface UpdateConfigInfoResp extends CommonResp {}
@@ -66,6 +67,7 @@ export interface GetConfigContentResp extends CommonResp {
     type: string;
     content?: string;
     create_time?: string;
+    version: number | string;
   }
 }
 
@@ -83,6 +85,7 @@ export interface GetConfigByParamsResp extends GetConfigContentResp {
         group_id: string;
         type: string;
         content?: string;
+        version: number | string;
     }
 }
 
