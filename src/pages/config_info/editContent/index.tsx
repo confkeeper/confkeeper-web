@@ -39,7 +39,8 @@ const EditConfigContextPage = () => {
         data_id: "",
         group_id: "",
         tenant_id: tenant_id || "",
-        type: "properties"
+        type: "properties",
+        version: ""
     } as any);
     const [editorContent, setEditorContent] = useState("");
     const [config_id, setConfigId] = useState('');
@@ -223,9 +224,22 @@ const EditConfigContextPage = () => {
     useEffect(() => {
         if (!isNewConfig && tenant_id && data_id && group_id) {
             setLoading(true);
-            ConfigInfoService.getByParams({tenant_id, data_id, group_id}).then((res) => {
-                const data = res.data || {content: '', data_id: '', group_id: '', tenant_id: '', type: ''};
-                setConfigContent({...data, content: data.content || ''});
+            ConfigInfoService.getByParams({tenant_id, data_id, group_id}).then(async (res) => {
+                const initialData = res.data || {
+                    content: '',
+                    data_id: '',
+                    group_id: '',
+                    tenant_id: '',
+                    type: '',
+                    version: ''
+                };
+                const cid = 'config_id' in initialData ? (initialData as any).config_id : '';
+                const detail = cid ? await ConfigInfoService.get({config_id: cid}) : undefined;
+                const data = {
+                    ...initialData,
+                    ...(detail?.data || {}),
+                };
+                setConfigContent({...data, content: data.content || '', version: data.version ?? ''});
                 setEditorContent(data.content || "");
                 setConfigId('config_id' in data ? data.config_id : '');
                 setLineEnding(detectLineEnding(data.content || ''));
@@ -233,7 +247,6 @@ const EditConfigContextPage = () => {
                     formApi.current.setValues(data);
                 }
                 // 获取行修改记录（blame）
-                const cid = 'config_id' in data ? (data as any).config_id : '';
                 fetchBlame(cid);
             }).finally(() => {
                 setLoading(false);
@@ -247,7 +260,8 @@ const EditConfigContextPage = () => {
                 data_id: "",
                 group_id: "",
                 tenant_id: tenant_id,
-                type: "properties"
+                type: "properties",
+                version: ""
             });
             if (formApi.current) {
                 formApi.current.setValues({
@@ -419,11 +433,21 @@ const EditConfigContextPage = () => {
                 }
             } else {
                 if (!config_id) return;
-                const success = await ConfigInfoService.update(config_id, payload);
+                if (configContent.version === undefined || configContent.version === null || configContent.version === '') {
+                    Toast.error('配置版本信息缺失，请刷新后重试');
+                    return;
+                }
+                const success = await ConfigInfoService.update(config_id, {
+                    ...payload,
+                    oldversion: configContent.version,
+                });
                 if (success) {
+                    const latest = await ConfigInfoService.get({config_id});
+                    const latestData = latest.data || {};
                     setConfigContent((prev: typeof configContent) => ({
                         ...prev,
-                        content: editorContent
+                        ...latestData,
+                        content: latestData.content ?? editorContent
                     }));
                     setDiffModalVisible(false);
                     // 保存后重新获取行修改记录（新版本已生成）
