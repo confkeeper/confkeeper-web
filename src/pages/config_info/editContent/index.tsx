@@ -614,12 +614,20 @@ const EditConfigContextPage = () => {
                                 display: 'flex',
                                 alignItems: 'center',
                                 gap: '12px',
+                                maxWidth: 'calc(100% - 16px)',
+                                padding: '6px 8px',
+                                borderRadius: '6px',
+                                border: '1px solid rgba(255, 255, 255, 0.14)',
+                                backgroundColor: 'rgba(30, 30, 30, 0.92)',
+                                boxShadow: '0 4px 16px rgba(0, 0, 0, 0.32)',
+                                backdropFilter: 'blur(6px)',
+                                flexWrap: 'wrap',
                             }}>
                                 <label style={{
                                     display: 'flex',
                                     alignItems: 'center',
                                     gap: '4px',
-                                    color: '#fff',
+                                    color: 'rgba(255, 255, 255, 0.92)',
                                     fontSize: '13px',
                                     cursor: 'pointer',
                                 }}>
@@ -644,7 +652,7 @@ const EditConfigContextPage = () => {
                                     display: 'flex',
                                     alignItems: 'center',
                                     gap: '8px',
-                                    color: '#fff',
+                                    color: 'rgba(255, 255, 255, 0.92)',
                                     fontSize: '13px',
                                     cursor: 'pointer',
                                 }}>
@@ -659,7 +667,7 @@ const EditConfigContextPage = () => {
                                     display: 'flex',
                                     alignItems: 'center',
                                     gap: '8px',
-                                    color: '#fff',
+                                    color: 'rgba(255, 255, 255, 0.92)',
                                     fontSize: '13px',
                                     cursor: 'pointer',
                                 }}>
@@ -711,6 +719,7 @@ const EditConfigContextPage = () => {
                                     wordWrap: wordWrap,
                                     fontSize: fontSize,
                                     glyphMargin: true,
+                                    padding: {top: 44},
                                 }}
                             />
                         </div>
