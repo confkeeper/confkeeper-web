@@ -288,6 +288,15 @@ const EditConfigContextPage = () => {
         setDiffModalVisible(false);
     };
 
+    const clearDiffDecorations = () => {
+        const editor = editorRef.current;
+        if (!editor) {
+            diffDecorationsRef.current = [];
+            return;
+        }
+        diffDecorationsRef.current = editor.deltaDecorations(diffDecorationsRef.current, []);
+    };
+
     const handleCompare = () => {
         setCompareModalVisible(true);
     };
@@ -428,6 +437,14 @@ const EditConfigContextPage = () => {
                     tenant_id: tenant_id || undefined,
                 });
                 if (success) {
+                    clearDiffDecorations();
+                    setConfigContent((prev: typeof configContent) => ({
+                        ...prev,
+                        ...payload,
+                        tenant_id: tenant_id || prev.tenant_id || '',
+                        content: editorContent,
+                    }));
+                    setCompareContent("");
                     setDiffModalVisible(false);
                     navigate(`/edit_content?tenant_id=${tenant_id}&data_id=${formValues.data_id}&group_id=${formValues.group_id}`, {replace: true});
                 }
@@ -444,11 +461,14 @@ const EditConfigContextPage = () => {
                 if (success) {
                     const latest = await ConfigInfoService.get({config_id});
                     const latestData = latest.data || {};
+                    clearDiffDecorations();
                     setConfigContent((prev: typeof configContent) => ({
                         ...prev,
                         ...latestData,
-                        content: latestData.content ?? editorContent
+                        ...payload,
+                        content: editorContent
                     }));
+                    setCompareContent("");
                     setDiffModalVisible(false);
                     // 保存后重新获取行修改记录（新版本已生成）
                     fetchBlame(config_id);
