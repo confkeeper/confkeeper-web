@@ -1,6 +1,7 @@
 import { defineConfig } from '@rsbuild/core';
 import { pluginReact } from '@rsbuild/plugin-react';
 import { pluginSass } from '@rsbuild/plugin-sass';
+import { pluginTailwindcss } from '@rsbuild/plugin-tailwindcss';
 import MonacoEditorWebpackPlugin from "monaco-editor-webpack-plugin";
 import path from 'path';
 // @ts-ignore
@@ -32,7 +33,7 @@ export default defineConfig({
             '@': path.resolve(__dirname, './')
         }
     },
-    plugins: [pluginReact(), pluginSass()],
+    plugins: [pluginReact({reactCompiler: true}), pluginSass(), pluginTailwindcss()],
     tools: {
         rspack: {
             plugins: [new MonacoEditorWebpackPlugin({
@@ -78,5 +79,9 @@ export default defineConfig({
         printFileSize: {
             diff: true,
         },
+    },
+    optimization: {
+        chunkIds: 'compat-hashed',
+        moduleIds: 'compat-hashed',
     },
 });
