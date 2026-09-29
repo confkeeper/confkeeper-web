@@ -104,7 +104,7 @@ const STATUS_DOT_CLASSES: Record<MonitorStatus, string> = {
     offline: 'bg-[rgb(var(--semi-red-5))] shadow-[0_0_0_4px_rgba(var(--semi-red-4),0.18)]',
 };
 
-const OVERVIEW_ITEM_CLASS = 'inline-flex items-center gap-1.5 whitespace-nowrap text-[13px] text-[var(--semi-color-text-2)]';
+const OVERVIEW_ITEM_CLASS = 'inline-flex items-center gap-1.5 whitespace-nowrap text-[13px] text-[--semi-color-text-2]';
 const OVERVIEW_VALUE_CLASS = 'text-[15px] font-[650] text-[var(--semi-color-text-0)] [font-variant-numeric:tabular-nums]';
 
 function parsePrometheusText(text: string): PrometheusSample[] {
@@ -255,28 +255,28 @@ function buildSparklineOption({
 function Tile({title, label, value, meta, children, foot}: TileProps) {
     return (
         <div
-            className="flex min-w-0 flex-col gap-1.5 rounded-xl border border-[var(--semi-color-fill-2)] bg-[var(--semi-color-bg-1)] px-4 pb-3 pt-3.5 shadow-[0_1px_2px_rgba(var(--semi-grey-9),0.04),0_2px_6px_rgba(var(--semi-grey-9),0.03)]"
+            className="flex min-w-0 flex-col gap-1.5 rounded-xl border border-[--semi-color-fill-2] bg-[--semi-color-bg-1] px-4 pb-3 pt-3.5 shadow-[0_1px_2px_rgba(var(--semi-grey-9),0.04),0_2px_6px_rgba(var(--semi-grey-9),0.03)]"
             role="group"
             aria-label={label}
         >
             <div className="flex min-w-0 items-center justify-between gap-2">
-                <span className="shrink-0 text-[13px] font-[650] text-[var(--semi-color-text-1)]">{title}</span>
+                <span className="shrink-0 text-[13px] font-[650] text-[--semi-color-text-1]">{title}</span>
                 {meta ? (
                     <span
-                        className="inline-flex min-w-0 justify-end truncate text-xs text-[var(--semi-color-text-2)] [font-variant-numeric:tabular-nums]">
+                        className="inline-flex min-w-0 justify-end truncate text-xs text-[--semi-color-text-2] [font-variant-numeric:tabular-nums]">
                         {meta}
                     </span>
                 ) : null}
             </div>
             <div
-                className="truncate text-[22px] font-[650] leading-7 text-[var(--semi-color-text-0)] [font-variant-numeric:tabular-nums]">
+                className="truncate text-[22px] font-[650] leading-7 text-[--semi-color-text-0] [font-variant-numeric:tabular-nums]">
                 {value}
             </div>
             <div className="relative flex min-w-0 items-center" style={{height: CHART_HEIGHT}}>
                 {children}
             </div>
             {foot ? (
-                <div className="truncate text-xs text-[var(--semi-color-text-2)] [font-variant-numeric:tabular-nums]">
+                <div className="truncate text-xs text-[--semi-color-text-2] [font-variant-numeric:tabular-nums]">
                     {foot}
                 </div>
             ) : null}
@@ -285,7 +285,7 @@ function Tile({title, label, value, meta, children, foot}: TileProps) {
 }
 
 function Placeholder() {
-    return <span className="select-none text-[var(--semi-color-text-3)]">-</span>;
+    return <span className="select-none text-[--semi-color-text-3]">-</span>;
 }
 
 const MetricsPage: React.FC = () => {
@@ -542,14 +542,14 @@ const MetricsPage: React.FC = () => {
                 className="mb-[22px] flex items-center justify-between gap-4 max-[700px]:flex-col max-[700px]:items-start">
                 <div className="min-w-0">
                     <Title heading={3} className="!mb-0 !mt-0 flex items-center gap-[9px] !text-[22px] !leading-[30px]">
-                        <IconHistogram className="text-[var(--semi-color-primary)]"/>
+                        <IconHistogram className="text-[--semi-color-primary]"/>
                         服务监控
                     </Title>
                     <Text type="tertiary" size="small">ConfKeeper 进程资源与运行状态</Text>
                 </div>
                 <div className="inline-flex shrink-0 items-center gap-3 max-[700px]:w-full max-[700px]:justify-between">
                     <span
-                        className="text-xs text-[var(--semi-color-text-2)] [font-variant-numeric:tabular-nums]">{version}</span>
+                        className="text-xs text-[--semi-color-text-2] [font-variant-numeric:tabular-nums]">{version}</span>
                     <span
                         className={`inline-flex max-w-full items-center gap-[7px] rounded-full px-3.5 py-[7px] text-[13px] font-semibold ${STATUS_PILL_CLASSES[status]}`}
                         role="status"
@@ -561,13 +561,13 @@ const MetricsPage: React.FC = () => {
             </div>
 
             <div
-                className="mb-[26px] flex flex-wrap items-center gap-[22px] rounded-xl border border-[var(--semi-color-fill-2)] bg-[var(--semi-color-bg-1)] px-5 py-3.5 shadow-[0_1px_2px_rgba(var(--semi-grey-9),0.04),0_2px_6px_rgba(var(--semi-grey-9),0.03)] max-[520px]:gap-3.5 max-[520px]:px-4 max-[520px]:py-3"
+                className="mb-[26px] flex flex-wrap items-center gap-[22px] rounded-xl border border-[--semi-color-fill-2] bg-[--semi-color-bg-1] px-5 py-3.5 shadow-[0_1px_2px_rgba(var(--semi-grey-9),0.04),0_2px_6px_rgba(var(--semi-grey-9),0.03)] max-[520px]:gap-3.5 max-[520px]:px-4 max-[520px]:py-3"
                 aria-label="服务概览"
             >
                 <span className={OVERVIEW_ITEM_CLASS}>
                     <span className={`size-2 shrink-0 rounded-full ${status === 'online'
                         ? 'bg-[rgb(var(--semi-green-5))] shadow-[0_0_0_4px_rgba(var(--semi-green-4),0.18)]'
-                        : 'bg-[var(--semi-color-text-3)]'}`}
+                        : 'bg-[--semi-color-text-3]'}`}
                     />
                     已运行 <b
                     className={OVERVIEW_VALUE_CLASS}>{formatDuration(latest?.processStartedAt ?? null, latest?.timestamp ?? Date.now())}</b>
@@ -590,8 +590,8 @@ const MetricsPage: React.FC = () => {
                 <div
                     className="mb-3 flex items-baseline justify-between gap-3 max-[520px]:flex-col max-[520px]:items-start max-[520px]:gap-0.5">
                     <span
-                        className="text-[13px] font-bold uppercase tracking-normal text-[var(--semi-color-text-2)]">系统状态</span>
-                    <span className="text-xs text-[var(--semi-color-text-2)] [font-variant-numeric:tabular-nums]">
+                        className="text-[13px] font-bold uppercase tracking-normal text-[--semi-color-text-2]">系统状态</span>
+                    <span className="text-xs text-[--semi-color-text-2] [font-variant-numeric:tabular-nums]">
                         最近 5 分钟 · 每 {REFRESH_INTERVAL / 1000} 秒采样
                         {latest ? ` · ${formatClock(latest.timestamp)} 更新` : ''}
                     </span>
