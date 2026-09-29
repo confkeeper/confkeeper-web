@@ -21,6 +21,7 @@ const SUPPORTED_METRICS = new Set([
     'process_network_transmit_bytes_total',
     'go_goroutines',
 ]);
+const REQUEST_TIMEOUT = REFRESH_INTERVAL * 3;
 
 interface PrometheusSample {
     name: string;
@@ -106,6 +107,13 @@ const STATUS_DOT_CLASSES: Record<MonitorStatus, string> = {
 
 const OVERVIEW_ITEM_CLASS = 'inline-flex items-center gap-1.5 whitespace-nowrap text-[13px] text-[--semi-color-text-2]';
 const OVERVIEW_VALUE_CLASS = 'text-[15px] font-[650] text-[var(--semi-color-text-0)] [font-variant-numeric:tabular-nums]';
+
+function withTimeout<T>(promise: Promise<T>, ms: number): Promise<T> {
+    return new Promise<T>((resolve, reject) => {
+        const timer = window.setTimeout(() => reject(new Error('请求超时')), ms);
+        promise.then(resolve, reject).finally(() => window.clearTimeout(timer));
+    });
+}
 
 function parsePrometheusText(text: string): PrometheusSample[] {
     const samples: PrometheusSample[] = [];
@@ -290,7 +298,10 @@ function Placeholder() {
 
 const MetricsPage: React.FC = () => {
     const version = useServerInfoStore((state) => state.version);
-    const [{data, loading, err}, refresh] = useService(() => MetricsService.get_metrics(), []);
+    const [{data, loading, err}, refresh] = useService(
+        () => withTimeout(MetricsService.get_metrics(), REQUEST_TIMEOUT),
+        [],
+    );
     const [latest, setLatest] = useState<RuntimeSnapshot | null>(null);
     const [history, setHistory] = useState<HistoryPoint[]>([]);
     const [parseError, setParseError] = useState<string | null>(null);
